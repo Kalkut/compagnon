@@ -16,7 +16,7 @@ sand.define('Compagnon/Compagnon', ['Compagnon/*'], function (r) {
         ]
       })
 
-      this.workspace.toolBar.on('toolBar:trash', function () {
+      this.workspace.on('workspace:toolBar:trash', function () {
         this.topBar.deleteRessource();
       }.bind(this))
 
@@ -32,12 +32,8 @@ sand.define('Compagnon/Compagnon', ['Compagnon/*'], function (r) {
         this.redo();
       }.bind(this))
 
-      this.on('compagnon:swap', function () {
+      this.on('compagnon:swap', function () {// Va surement être rendu obsolète par workspace:swap
         this.workspace.item.swap();
-      })
-
-      this.workspace.item.on('item:swap', function () {
-        this.topBar.ressources[this.topBar.currentIndex].update();
       })
     },
 

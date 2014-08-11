@@ -6,18 +6,33 @@ sand.define('Compagnon/ToolBar', function (r) {
         children : [
         {
           tag : '.drawing',
+          events : {
+            mousedown : this.drawing.bind(this),
+          }
         },
         {
           tag : '.upload',
+          events : {
+            mousedown : this.upload.bind(this),
+          }
         },
         {
           tag : '.link',
+          events : {
+            mousedown : this.link.bind(this),
+          }
         },
         {
           tag : '.picture',
+          events : {
+            mousedown : this.picture.bind(this),
+          }
         },
         {
           tag : '.delete',
+          events : {
+            mousedown : this.trash.bind(this)
+          }
         }
         ]
       })
@@ -28,11 +43,11 @@ sand.define('Compagnon/ToolBar', function (r) {
     },
 
     upload : function () {
-      this.fire('toolBar:upload');
+      this.fire('toolBar:upload',type);
     },
 
     link : function () {
-      this.fire('toolBar:link');
+      this.fire('toolBar:link',type);
     },
 
     picture : function () {
@@ -40,7 +55,7 @@ sand.define('Compagnon/ToolBar', function (r) {
     },
 
     trash : function () {
-      this.fre('toolBar:trash')
+      this.fire('toolBar:trash')
     },
     
   })

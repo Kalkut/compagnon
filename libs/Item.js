@@ -15,16 +15,12 @@ sand.define('Compagnon/Item', function (r) {
         }]
       })
 
+      input ? this.input = jQuery.extend({},input) : this.input = {};
       this.type = input ? (input.type ? input.type : 'item') : 'item';
       this.preview;
-
     },
 
-    update : function () {
-      this.fire('item:update',this.type);
-    },
-
-    swap : function (type) {
+    swap : function (type) {// Va être rendu obsolète par workspace:swap
       this.type = type
       this.fire('item:swap', this.type)
     },

@@ -12,6 +12,13 @@ var serveur =  http.createServer(function (req,res) {
 			if (err) throw err;
 			res.end(data);
 		})
+	} else if (req.url.split(".")[1] === 'min' && req.url.split(".")[2] === 'js') {
+		//console.log(req.url.split(".")[0]);
+		fs.readFile('libs' + req.url.split(".")[0] + "." + req.url.split(".")[1] +".js", function (err, data) {
+			if (err) throw err;
+			res.end(data);
+			console.log(req.url.split(".")[0]);
+		})
 	}
 	else if (req.url.split(".")[1] === 'js') {
 		//console.log(req.url.split(".")[0]);
