@@ -1,0 +1,34 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Compagnon</title>
+  <link rel="stylesheet" href="/style.css"></link>
+</meta>
+</head>
+<body>
+
+  <script src="/sandmin.js"></script>
+  <script src="/jquery.js"></script>
+  <script src="/toDOM.js"></script>
+  <script src="/Seed.js"></script>
+  <script src="/Banner.js"></script>
+  <script src="/ToolBar.js"></script>
+  <script src="/TopBar.js"></script>
+  <script src="/ActionBar.js"></script>
+  <script src="/Item.js"></script>
+  <script src="/Workspace.js"></script>
+  <script src="/Ressource.js"></script>
+  <script src="/Compagnon.js"></script>
+
+  <script type="text/javascript">
+  
+  var b;
+
+  sand.require('Compagnon/*', function (r) {
+    //console.log(r)
+    b = new r.Compagnon.Compagnon();
+    document.body.appendChild(b.el);
+  })
+  </script>
+</body>
+</html>
