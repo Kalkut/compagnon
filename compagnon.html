@@ -26,12 +26,26 @@
   <script src="/core.min.js"></script>
   <script src="/DOM.min.js"></script>
   <script src="/SeedWithSand.js"></script>
+
+  <script src="/Buttons.js"></script>
+  <script src="/colorfunc.js"></script>
+  <script src="/ColorGrid.js"></script>
+  
+  <script src="/ColorPicker.js"></script>
+  <script src="/CustomBar.js"></script>
+  <script src="/Input.js"></script>
+
+  <script src="/SlideBar.js"></script>
+  <script src="/Square.js"></script>
+  <script src="/SubtlePicker.js"></script>
+
+  <script src="/Canvas.js"></script>
   
   <script type="text/javascript">
   
   var b;
 
-  sand.require('Compagnon/*', function (r) {
+  sand.require('Compagnon/*','Drawing/*', function (r) {
     //console.log(r)
     b = new r.Compagnon.Compagnon();
     document.body.appendChild(b.el);
