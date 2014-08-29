@@ -5,7 +5,7 @@ sand.define('Compagnon/Drawing',['Compagnon/Item','drawing/Canvas'], function (r
       this.el.className += " drawing";
       
       this.canvas = new r.Canvas({
-        canvas : $('<canvas></canvas>').attr({width : 390, height : 210 })[0],
+        canvas : $('<canvas></canvas>').attr({width : window.innerWidth*0.894, height : window.innerHeight*0.38 })[0],
         curSize : 5,
         curTool : "marqueur",
         curColor : '#7c9cbc',

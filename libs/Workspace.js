@@ -71,11 +71,15 @@ sand.define('Compagnon/Workspace',['Compagnon/ToolBar','Compagnon/Drawing','Comp
         children : [
         this.toolBar.el,
         this.switchPicto,
-        this.item.drawing.el,
-        this.item.video.el,
-        this.item.url.el,
-        this.item.image.el
-        ]
+        {
+          tag : '.workspace',
+          children : [
+            this.item.drawing.el,
+            this.item.video.el,
+            this.item.url.el,
+            this.item.image.el
+          ]
+        }]
       })
 
       this.hashTypes = { drawing : "Drawing", video : "Video", image : "Image", url : "Url" };
