@@ -42,10 +42,10 @@ sand.define('Compagnon/Workspace',['Compagnon/ToolBar','Compagnon/Drawing','Comp
       if(!this.input.paths) this.input.paths = [];
       
       this.item = { 
-        drawing : new r.Drawing(), 
-        video : new r.Video(), 
-        url : new r.Url(), 
-        image : new r.Image()
+        drawing : new r.Drawing(input), 
+        video : new r.Video(input), 
+        url : new r.Url(input), 
+        image : new r.Image(input)
       };
 
       for (var type in this.item) {
@@ -88,13 +88,9 @@ sand.define('Compagnon/Workspace',['Compagnon/ToolBar','Compagnon/Drawing','Comp
 
     update : function (type) {
 
-      /*if(this.currentType === "drawing" && this.pathsToAdd) {
-        this.input.paths.push.apply(this.input.paths,this.pathsToAdd);
-      }*/ 
-
       console.log(this.input.paths);
-
-      this.el.removeChild(this.item[type].el);
+      var daddy = this.item[type].el.parentNode;
+      daddy.removeChild(this.item[type].el);
       
       this.item[this.currentType].hide();
       this.item[type] = this.item[this.currentType].create(r[this.hashTypes[type]],this.input);
@@ -107,7 +103,7 @@ sand.define('Compagnon/Workspace',['Compagnon/ToolBar','Compagnon/Drawing','Comp
 
 
       
-      this.el.appendChild(this.item[type].el);
+      daddy.appendChild(this.item[type].el);
       this.item[type].show();
       
       this.currentType = type;

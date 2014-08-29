@@ -46,6 +46,7 @@ sand.define('Compagnon/TopBar',['Compagnon/Ressource','DOM/handle'], function  (
         this.ressources[i].el.addEventListener("mousedown", function (i) {
           this.currentIndex = i;
         }.bind(this).curry(i));
+
       }
 
 
@@ -63,19 +64,19 @@ sand.define('Compagnon/TopBar',['Compagnon/Ressource','DOM/handle'], function  (
       }.bind(this));
 
       r.handle(newR.el).drag({
-          start : function(e) {
-            var x = e.xy[0];
-            var y = e.xy[1];
-          }.wrap(this),
+        start : function(e) {
+          var x = e.xy[0];
+          var y = e.xy[1];
+        }.wrap(this),
 
-          drag : function(e) {
-            newR.el.style.left = e.xy[0];
-            newR.el.style.top = e.xy[1];
-          }.wrap(this),
+        drag : function(e) {
+          newR.el.style.left = e.xy[0];
+          newR.el.style.top = e.xy[1];
+        }.wrap(this),
 
-          end : function(e) {
-          }.wrap(this)
-        })
+        end : function(e) {
+        }.wrap(this)
+      })
 
       this.fire('topBar:addedRessource');
       this.currentIndex
@@ -96,4 +97,4 @@ sand.define('Compagnon/TopBar',['Compagnon/Ressource','DOM/handle'], function  (
     }
 
   })
-      })
+})

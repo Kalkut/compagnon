@@ -1,10 +1,10 @@
 sand.define('Compagnon/Compagnon', ['Compagnon/*'], function (r) {
   return Seed.extend({
     '+init' : function (input) {
-      this.actionBar = new r.Compagnon.ActionBar();
-      this.banner = new r.Compagnon.Banner();
-      this.topBar = new r.Compagnon.TopBar();
-      this.workspace = new r.Compagnon.Workspace();
+      this.actionBar = new r.Compagnon.ActionBar(input);
+      this.banner = new r.Compagnon.Banner(input);
+      this.topBar = new r.Compagnon.TopBar(input);
+      this.workspace = new r.Compagnon.Workspace(input);
 
       this.el = toDOM({
         tag : '.compagnon',
