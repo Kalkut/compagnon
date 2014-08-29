@@ -49,10 +49,22 @@ html body{
   height: 73.7%;
 }
 
-.item.drawing,.item.video,.item.url,.item.image{
+.item.drawing,.item.video,.item.url{
   position: absolute;
   width: 100%;
   height: 100%;
+}
+
+.item.image{
+  padding: 2.7253669% 2.2312373% 2.7253669% 2.4340771%;
+  width: 80%;
+  height: 75.780933063%;
+  margin : 5% 0% 10% 10%;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  border: 1px solid #000000;
+  border-radius: 11px;
 }
 
 .actions {
@@ -89,7 +101,24 @@ html body{
   border: 1px solid #000000;
 }
 
-.legend {
+.drawing .legend,.video .legend{
   width: 100%;
   height: 48%;
 }
+
+.image .legend {
+  width: 100%;
+  height: 18%;
+  float: left;
+  top: 361.472px;
+  position: relative;
+  margin-top: 10%;
+  outline: none;;
+}
+
+.image .case{
+  border-bottom-width : 14px;
+  border-bottom-style: solid;
+  border-bottom-color: #408486;
+}
+

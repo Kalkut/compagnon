@@ -3,9 +3,8 @@ sand.define('Compagnon/Drawing',['Compagnon/Item','drawing/Canvas'], function (r
     '+init' : function (input) {//color:pic
       this.type = "drawing";
       this.el.className += " drawing";
-      
       this.canvas = new r.Canvas({
-        canvas : $('<canvas></canvas>').attr({width : window.innerWidth*0.894, height : window.innerHeight*0.38 })[0],
+        canvas : $('<canvas></canvas>').attr({width : window.innerWidth*0.8977, height : window.innerHeight*0.423748 })[0],
         curSize : 5,
         curTool : "marqueur",
         curColor : '#7c9cbc',
