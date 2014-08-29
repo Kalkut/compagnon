@@ -81,6 +81,7 @@ sand.define('drawing/Canvas',['drawing/Buttons'], function (req) {
           div.appendChild(this.fg);
           div.appendChild(this.bg);
           this.el = div;
+          this.el.className = "drawing-canvas";
 
           var draw = this;
 
@@ -145,9 +146,15 @@ sand.define('drawing/Canvas',['drawing/Buttons'], function (req) {
       },
 
     	//Ajoute ou enlève une bordure
-    	addBorder : function () { this.canvas.style.border = '1px solid #000000'; },
+    	addBorder : function () { 
+        this.canvas.style.border = '1px solid #000000';
+        this.bg.style.border = '1px solid #000000'; 
+      },
 
-    	removeBorder : function () {this.canvas.style.border = null; },
+    	removeBorder : function () {
+        this.canvas.style.border = null; 
+        this.bg.style.border = null;
+      },
 
     	//Met à jour la taille du canvas
     	updateCanvas : function (width,height) {

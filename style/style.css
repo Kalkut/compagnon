@@ -2,29 +2,30 @@ html body{
   width: 95.5%;
   height: 95.5%;
   padding: 0px;
+  background-image: url('/pattern.png');
 }
 
 .compagnon {
-
-  border: 1px solid #000000;
 }
 
 .header {
-  /*height: 25;*/
   height: 4.854368932038835%;
-  border: 1px solid #000000;
+  background-image: url('camo.png');
 }
+
 
 .items-block {
   /*height: 60;*/
   width: 100%;
   height : 10.679611650485436%;
-  border: 1px solid #000000;
 }
 
 .select{
   height : 23.636363636363636%;
   width: 10.952380952380952%;
+  background-image: url('select.png');
+  background-repeat:no-repeat;
+  background-size:contain;
 }
 
 .items{
@@ -32,30 +33,83 @@ html body{
   height: 76.36363636363636%;
 }
 
+.actions .new {
+  background-image: url('add.png');
+  background-repeat:no-repeat;
+  background-size:contain;
+}
+
+.actions .undo {
+  background-image: url('undo.png');
+  background-repeat:no-repeat;
+  background-size:contain;
+}
+
+.actions .redo {
+  background-image : url('redo.png');
+  background-repeat:no-repeat;
+  background-size:contain;
+}
+
+.actions .separation {
+  background-image: url('separation.png');
+  background-repeat:no-repeat;
+  background-size:contain;
+}
+
+.panel .drawing {
+  background-image: url('drawing.png');
+  background-repeat:no-repeat;
+  background-size:contain;
+}
+
+.panel .upload {
+  background-image: url('upload.png'); 
+  background-repeat:no-repeat;
+  background-size:contain;
+}
+
+.panel .link {
+  background-image: url('link.png');
+  background-repeat:no-repeat;
+  background-size:contain;
+}
+
+.panel .picture {
+  background-image: url('camera.png');
+  background-repeat:no-repeat;
+  background-size:contain;
+}
+
+.panel .delete {
+  background-image: url('trash.png');
+  background-repeat:no-repeat;
+  background-size:contain;
+  bottom: 0px;
+  position: absolute;
+}
 
 .items .item {
-  border: 1px solid #000000;
   height : 6.796116504854369%;
   width: 8.333333333333333%;
-  background-color: #CCCC33;
   position : absolute;
+  background-color: #654FCA;
 }
 
 .workspace {
-  border: 1px solid #000000;
-  left: 6%;
+  left: 6.5%;
   position: absolute;
-  width: 90%;
+  width: 89.5%;
   height: 73.7%;
 }
 
-.item.drawing,.item.video,.item.url{
+.item.video,.item.url{
   position: absolute;
   width: 100%;
   height: 100%;
 }
 
-.item.image{
+.item.image,.item.drawing {
   padding: 2.7253669% 2.2312373% 2.7253669% 2.4340771%;
   width: 80%;
   height: 75.780933063%;
@@ -63,62 +117,59 @@ html body{
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
-  border: 1px solid #000000;
   border-radius: 11px;
+  background-color: #FFFFFF;
 }
 
 .actions {
   height: 3.1067961165048542%;
   width: 15%;
-  border: 1px solid #000000;
 }
 
 .actions .new, .actions .undo,.actions .redo {
   height: 100%;
   width: 30.90909090909091%;
   float: left;
-  background-color: #00FF00;
-  border: 1px solid #000000;
 }
 
 .edit {
   height: 77.08737864077669%;
   width: 100%;
-  border: 1px solid #000000;
 }
 
 .panel {
   float: left;
   width: 5%;
   height: 100%;
-  border: 1px solid #000000;
 }
 
 .panel div {
   width: 100%;
   height: 5.037783375314862%;
-  background-color: #FF0000;
-  border: 1px solid #000000;
 }
 
-.drawing .legend,.video .legend{
+.video .legend{
   width: 100%;
   height: 48%;
 }
 
-.image .legend {
+.image .legend,.drawing .legend {
   width: 100%;
   height: 18%;
   float: left;
-  top: 361.472px;
   position: relative;
   margin-top: 10%;
   outline: none;;
 }
 
-.image .case{
+.image .legend{
+  top: 361.472px;
+}
+
+.image .case,.drawing-canvas{
   border-bottom-width : 14px;
   border-bottom-style: solid;
   border-bottom-color: #408486;
 }
+
 

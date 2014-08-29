@@ -4,7 +4,7 @@ sand.define('Compagnon/Drawing',['Compagnon/Item','drawing/Canvas'], function (r
       this.type = "drawing";
       this.el.className += " drawing";
       this.canvas = new r.Canvas({
-        canvas : $('<canvas></canvas>').attr({width : window.innerWidth*0.8977, height : window.innerHeight*0.423748 })[0],
+        canvas : $('<canvas></canvas>').attr({width : window.innerWidth*0.676, height : window.innerHeight*0.353 })[0],
         curSize : 5,
         curTool : "marqueur",
         curColor : '#7c9cbc',
@@ -16,6 +16,8 @@ sand.define('Compagnon/Drawing',['Compagnon/Item','drawing/Canvas'], function (r
         this.canvas.redraw();
       }
 
+      this.canvas.removeBorder();
+      
       this.canvas.on("canvas:newPath", function (paths) {
         this.fire('item:isDrawing', paths)
       }.bind(this));
