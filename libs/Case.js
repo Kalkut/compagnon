@@ -34,6 +34,7 @@ sand.define('Case',["Geo/*"], function (r) {
 			this.imgRect;
 			this.divRect;
 			this.staticPoint;
+			this.states = [];
 			
 			this.div = toDOM({
 				tag : 'div.' + (options.prefix ? (options.prefix + "-") : "") + "case",
@@ -102,7 +103,10 @@ sand.define('Case',["Geo/*"], function (r) {
 				
 				addEventListener("mouseup", function (e) {
 					this.clicking = false;
+					this.states.push({lastAction : 'move', rect : this.imgRect, left : this.img.style.left, top : this.img.style.top, width : this.img.style.width, height : this.img.style.height});	
 				}.bind(this))
+
+
 
 
 				this.div.addEventListener('mousewheel', function (e) {
@@ -152,6 +156,8 @@ sand.define('Case',["Geo/*"], function (r) {
 							this.imgRect = this.potentialRect;
 						}
 						
+						
+
 						this.fire('case:imageMovedPx',this.img.style.left,this.img.style.top,this.img.style.width,this.img.style.height);
 						this.fire('case:imageMovedInt',parseInt(this.img.style.left),parseInt(this.img.style.top),parseInt(this.img.style.width),parseInt(this.img.style.height));
 					}
@@ -162,6 +168,8 @@ sand.define('Case',["Geo/*"], function (r) {
 				addEventListener("mousemove", this.div.onmousemove )
 
 				this.loadCase(true);
+
+				this.states.push({lastAction : 'init', rect : this.imgRect, left : this.img.style.left, top : this.img.style.top, width : this.img.style.width, height : this.img.style.height});	
 				
 			}	
 		},
@@ -175,7 +183,6 @@ sand.define('Case',["Geo/*"], function (r) {
 
 			if (!this.fit && !(this.imgRect.segX.c2 >= this.divRect.segX.c2 && this.imgRect.segX.c1 <= this.divRect.segX.c1 && this.imgRect.segY.c1 <= this.divRect.segY.c1 && this.imgRect.segY.c2 >= this.divRect.segY.c2)){
 				var fitImg = this.divRect.move({staticPoint : this.staticPoint}).forcedIn(this.imgRect);
-				console.log('verif')
 				
 				 this.imgRect.segX.c1 = this.imgRect.segX.c1 - fitImg.segX.c1;
 				 this.img.style.left =  this.imgRect.segX.c1 + 'px'; 
@@ -184,8 +191,9 @@ sand.define('Case',["Geo/*"], function (r) {
 				 this.imgRect.segY.c2 = this.imgRect.segY.c1 + parseInt(this.img.style.height);
 				 this.imgRect.segX.c2 = this.imgRect.segX.c1 + parseInt(this.img.style.width);
 			}
+			// WARNING : STATE SHOULD BE SAVED ELSEWHERE : WAY TOO MUCH VALUES	
+			//this.states.push({lastAction : 'zoom', rect : this.imgRect, left : this.img.style.left, top : this.img.style.top, width : this.img.style.width, height : this.img.style.height});	
 			
-
 		},
 
 		loadCase : function (firstLoad) {//methode permettant d'initialiser la position de l'image

@@ -4,6 +4,8 @@ sand.define('Compagnon/Item', function (r) {
       this.el = toDOM({
         tag : '.item',
       })
+      this.actions = [];
+      this.cancel = 0;
 
       input ? this.input = jQuery.extend({},input) : this.input = {};
       this.type = input ? (input.type ? input.type : 'item') : 'item';
@@ -16,8 +18,17 @@ sand.define('Compagnon/Item', function (r) {
         },
         events : {
           keyup : function () {
+            if(this.actions && this.cancel) {
+              for(var i = 0; i <= this.cancel; i++ ) {
+                this.actions.pop();
+              }
+              this.cancel = 0;
+            }
             this.fire('item:legendUpdated',this.legend.innerHTML);
-          }.bind(this)
+          }.bind(this),
+          blur : function () {
+            this.actions.push('type');
+          }.bind(this),
         },
         innerHTML : this.input.legend || ""
       })

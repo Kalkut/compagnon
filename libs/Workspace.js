@@ -70,22 +70,19 @@ sand.define('Compagnon/Workspace',['Compagnon/ToolBar','Compagnon/Drawing','Comp
 
     },
 
-    update : function (type,data) {
+    update : function (type,data,legend,index,cancel) {
       if(type){
-        if(!data) data = {};
-        var daddy = this.items[this.currentIndex].el.parentNode;
-        var legend = this.items[this.currentIndex].legend.innerHTML;
-        daddy.removeChild(this.items[this.currentIndex].el);
-        this.items[this.currentIndex] = this.create(r[this.hashTypes[type]],data);
-        daddy.appendChild(this.items[this.currentIndex].el);
-        this.items[this.currentIndex].legend.innerHTML = legend;
+        if(!data) var data = {};
+        if(!index) var index = this.currentIndex;
+        if(!legend) var legend = this.items[index].legend.innerHTML || "";
+        var daddy = this.items[index].el.parentNode;
+        daddy.removeChild(this.items[index].el);
+        this.items[index] = this.create(r[this.hashTypes[type]],data);
+        daddy.appendChild(this.items[index].el);
+        this.items[index].legend.innerHTML = legend;
 
-        this.fire('workspace:updated',this.currentIndex);
+        if(!cancel) this.fire('workspace:updated',this.currentIndex,type,jQuery.extend({},data),legend);
       }
-    },
-
-    addItem : function (type,data) {
-      
     },
 
   })

@@ -6,11 +6,9 @@ sand.define('Compagnon/Compagnon', ['Compagnon/*','DOM/handle','PrototypeExtensi
       this.topBar = new r.Compagnon.TopBar(input);
       this.workspace =  new r.Compagnon.Workspace(input);
       this.currentIndex = input.currentIndex || 0;
-      this.workData = [];
-
-      for (var i = 0, n = this.topBar.ressources.length; i < n; i++) {
-        this.workData.push([this.topBar.ressources[i],this.workspace.items[i]])
-      }
+      this.actions = [];
+      this.cancel = 0;
+      
 
       this.el = toDOM({
         tag : '.compagnon',
@@ -45,6 +43,10 @@ sand.define('Compagnon/Compagnon', ['Compagnon/*','DOM/handle','PrototypeExtensi
         this.delete();
       }.bind(this))
 
+      this.workspace.on('workspace:updated', function (index,type,data,legend) {
+        this.actions.push({ action : "update", type : type, data : data, legend : legend});
+      }.bind(this));
+
       this.on('compagnon:swap', function () {// Va surement être rendu obsolète par workspace:swap
         this.workspace.item.swap();
       }.bind(this))
@@ -64,7 +66,12 @@ sand.define('Compagnon/Compagnon', ['Compagnon/*','DOM/handle','PrototypeExtensi
     },
 
     undo : function () { //actions à annuler à spécifier
-      this.fire('compagnon:undo');
+      if(this.actions) {
+        this.cancel++
+        var actionToCancel = this.actions[this.actions.length - 1 - this.cancel];
+        if(actionToCancel.action === 'update' )this.workspace.update(actionToCancel.type,actionToCancel.data,actionToCancel.index,actionToCancel.legend,true);
+        this.fire('compagnon:undo');
+      }
     },
 
     redo : function () {//actions à rétablir à spécifier
@@ -78,7 +85,6 @@ sand.define('Compagnon/Compagnon', ['Compagnon/*','DOM/handle','PrototypeExtensi
 
       this.topBar.ressources.splice(this.currentIndex,1);
       this.workspace.items.splice(this.currentIndex,1);
-      this.workData.splice(this.currentIndex,1);
 
       for (var i = 0, n = this.topBar.ressources.length; i < n; i++) {
         this.topBar.ressources[i].el.addEventListener("mousedown", function (i) {
@@ -131,7 +137,6 @@ sand.define('Compagnon/Compagnon', ['Compagnon/*','DOM/handle','PrototypeExtensi
         this.topBar.ressources.el.style.backgroundImage = preview;
       }.bind(this))
 
-      //this.workData.push([this.topBar.ressources[this.currentIndex],this.workspace.items[this.currentIndex]]);
       this.fire('topBar:addedRessource',this.currentIndex);
       this.workspace.fire('Workspace:newCurrentIndex',this.currentIndex)
       
