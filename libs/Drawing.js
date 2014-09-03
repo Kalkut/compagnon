@@ -34,8 +34,7 @@ sand.define('Compagnon/Drawing',['Compagnon/Item','drawing/Canvas'], function (r
       }.bind(this));
 
       this.canvas.el.addEventListener("mouseup", function () {
-        
-        this.fire('drawing:snapshotTaken',this.canvas.bg.toDataURL())
+        this.fire('Item:snapshotTaken',this.canvas.bg.toDataURL())
       }.bind(this));
 
       this.el.appendChild(this.canvas.el);

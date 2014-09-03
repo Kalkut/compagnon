@@ -41,6 +41,11 @@ sand.define('Compagnon/Compagnon', ['Compagnon/*','DOM/handle','PrototypeExtensi
 
       this.workspace.on('workspace:updated', function (index,type,data,legend) {
         this.actions.push({ action : "update", type : type, data : data, legend : legend});
+        this.workspace.items[index].on('Item:snapshotTaken', function (preview) {
+          this.topBar.ressources[index].el.style.backgroundImage = "url(\"" + preview + "\")";
+        }.bind(this))
+        this.topBar.ressources[index].el.className = 'mini-item ' + type;
+        if(this.workspace.items[index].preview) this.workspace.items[index].fire('Item:snapshotTaken',this.workspace.items[index].preview);
       }.bind(this));
 
       this.on('Compagnon:itemAdded', function (newindex) {
@@ -61,8 +66,13 @@ sand.define('Compagnon/Compagnon', ['Compagnon/*','DOM/handle','PrototypeExtensi
 
 
       for(var k = 0, len = this.workspace.items.length; k < len; k++) {
-        this.workspace.items[k].on('drawing:snapshotTaken', function (k,preview) {
-          this.topBar.ressources[k].el.style.backgroundImage = "url(" + preview + ")";
+        this.workspace.items[k].on('Item:snapshotTaken', function (k,preview) {
+          this.topBar.ressources[k].el.style.backgroundImage = "url(\"" + preview + "\")";
+        }.bind(this).curry(k))
+        
+        this.topBar.ressources[k].el.addEventListener("mousedown", function (k) {
+          this.select(k);
+          this.currentIndex = k;
         }.bind(this).curry(k))
       }
 
@@ -87,7 +97,7 @@ sand.define('Compagnon/Compagnon', ['Compagnon/*','DOM/handle','PrototypeExtensi
       if(this.actions) {
         this.cancel--
         var actionToCancel = this.actions[this.actions.length - 1 - this.cancel];
-        if(actionToCancel.action === 'update' )this.workspace.update(actionToCancel.type,actionToCancel.data,actionToCancel.index,actionToCancel.legend,true);
+        if(actionToCancel.action === 'update' ) this.workspace.update(actionToCancel.type,actionToCancel.data,actionToCancel.index,actionToCancel.legend,true);
         else if (actionToCancel.action === 'add') this.add(null,null,true);
         else if (actionToCancel.action === 'delete') this.delete(true);
       }
@@ -132,6 +142,7 @@ sand.define('Compagnon/Compagnon', ['Compagnon/*','DOM/handle','PrototypeExtensi
       var newIndice = this.topBar.ressources.length - 1;
       
       newR.el.addEventListener("mousedown", function () {
+        this.select(newIndice);
         this.currentIndex = newIndice;
       }.bind(this));
 
@@ -152,8 +163,8 @@ sand.define('Compagnon/Compagnon', ['Compagnon/*','DOM/handle','PrototypeExtensi
       this.workspace.items.push(new r.Compagnon[this.workspace.hashTypes[type]](data));
       daddy.appendChild(this.workspace.items[this.currentIndex].el);
 
-      this.workspace.items[newIndice].on('drawing:snapshotTaken', function (preview) {
-        this.topBar.ressources.el.style.backgroundImage = preview;
+      this.workspace.items[this.currentIndex].on('Item:snapshotTaken', function (preview) {
+          this.topBar.ressources[this.currentIndex].el.style.backgroundImage = "url(\"" + preview + "\")";
       }.bind(this))
 
       if(!cancel) this.fire('Compagnon:itemAdded',this.currentIndex);

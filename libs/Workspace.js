@@ -80,7 +80,7 @@ sand.define('Compagnon/Workspace',['Compagnon/ToolBar','Compagnon/Drawing','Comp
         this.items[index] = this.create(r[this.hashTypes[type]],data);
         daddy.appendChild(this.items[index].el);
         this.items[index].legend.innerHTML = legend;
-
+        this.input.legend = legend;
         if(!cancel) this.fire('workspace:updated',this.currentIndex,type,jQuery.extend({},data),legend);
       }
     },

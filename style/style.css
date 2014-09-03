@@ -6,8 +6,6 @@ body{
   margin: 0px;
 }
 
-.compagnon {
-}
 
 .header {
   height: 4.854368932038835%;
@@ -19,12 +17,14 @@ body{
 .items-block {
   margin: 0% 0% 1% 2%;
   width: 100%;
-  height : 10.679611650485436%;
+  position: relative;
+  height : 8.5%;
+  top: 40px;
 }
 
 .select{
-  height : 23.636363636363636%;
-  width: 10.952380952380952%;
+  height : 32%;
+  width: 12%;
   background-image: url('select.png');
   background-repeat:no-repeat;
   background-size:contain;
@@ -63,24 +63,32 @@ body{
   background-image: url('drawing.png');
   background-repeat:no-repeat;
   background-size:contain;
+  top : 32%;
+  position: relative;
 }
 
 .panel .upload {
   background-image: url('upload.png'); 
   background-repeat:no-repeat;
   background-size:contain;
+  top : 32%;
+  position: relative;
 }
 
 .panel .link {
   background-image: url('link.png');
   background-repeat:no-repeat;
   background-size:contain;
+  top : 32%;
+  position: relative;
 }
 
 .panel .picture {
   background-image: url('camera.png');
   background-repeat:no-repeat;
   background-size:contain;
+  top : 32%;
+  position: relative;
 }
 
 .panel .delete {
@@ -91,16 +99,26 @@ body{
   position: absolute;
 }
 
-.items .item {
-  height : 6.796116504854369%;
+.mini-item {
+  /*height : 6.796116504854369%;
   width: 8.333333333333333%;
-  position : absolute;
-  /*position: relative;
-  width: 10%;
-  height: 100%;*/
+  position : absolute;*/
+  position: relative;
+  width: 8.5%;
+  height: 100%;
   float: left;
+  padding-right: 1%;
   margin-right: 1%;
-  background-color: #654FCA;
+  background-color: #FFFFFF;
+  background-repeat: no-repeat;
+}
+
+.mini-item.drawing{
+  background-size: contain;
+}
+
+.mini-item.video,.mini-item.image {
+  background-size: cover;
 }
 
 .workspace {
@@ -119,7 +137,7 @@ body{
 .item.image,.item.drawing,.item.video {
   padding: 2.7253669% 2.2312373% 2.7253669% 2.4340771%;
   width: 80%;
-  height: 75.780933063%;
+  height: 100%;
   margin : 10% 0% 5% 10%;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -131,6 +149,8 @@ body{
 .actions {
   height: 3.1067961165048542%;
   width: 15%;
+  position: relative;
+  top: 50;
 }
 
 .actions .new, .actions .undo,.actions .redo {
@@ -140,8 +160,10 @@ body{
 }
 
 .edit {
-  height: 77.08737864077669%;
+  height: 75%;
   width: 100%;
+  position: absolute;
+  bottom: 0px;
 }
 
 .panel {
@@ -155,14 +177,10 @@ body{
   height: 5.037783375314862%;
 }
 
-.video .legend{
-  width: 100%;
-  height: 48%;
-}
 
 .image .legend,.drawing .legend,.video .legend {
   width: 100%;
-  height: 18%;
+  height: 10%;
   float: left;
   position: relative;
   margin-top: 10%;
@@ -173,8 +191,8 @@ body{
   top: 361.472px;
 }
 
-.image .case,.drawing-canvas{
-  border-bottom-width : 14px;
+.image .case,.drawing-canvas,.iframe{
+  border-bottom-width : 5px;
   border-bottom-style: solid;
   border-bottom-color: #408486;
 }

@@ -11,6 +11,7 @@ sand.define('Compagnon/Image',['Compagnon/Item','Case'], function (r) {
         type : 'img'
       });
 
+      this.preview = input.link || '';
 
       this.el.appendChild(this.imgCase.div);
       this.el.appendChild(this.legend);
