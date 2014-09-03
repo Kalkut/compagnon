@@ -6,7 +6,7 @@ sand.define('Compagnon/Compagnon', ['Compagnon/*','DOM/handle','PrototypeExtensi
       this.topBar = new r.Compagnon.TopBar(input);
       this.workspace =  new r.Compagnon.Workspace(input);
       this.currentIndex = input.currentIndex || 0;
-      this.actions = [];
+      this.actions = [{ action : "update", type : "drawing"}];
       this.cancel = 0;
       
 
@@ -35,10 +35,6 @@ sand.define('Compagnon/Compagnon', ['Compagnon/*','DOM/handle','PrototypeExtensi
         this.redo();
       }.bind(this))
 
-      this.topBar.on('topBar:addedRessource', function (newindex) {
-        this.workspace.currentIndex = this.currentIndex = newindex; 
-      }.bind(this))
-
       this.workspace.on('workspace:toolBar:trash', function () {
         this.delete();
       }.bind(this))
@@ -46,6 +42,17 @@ sand.define('Compagnon/Compagnon', ['Compagnon/*','DOM/handle','PrototypeExtensi
       this.workspace.on('workspace:updated', function (index,type,data,legend) {
         this.actions.push({ action : "update", type : type, data : data, legend : legend});
       }.bind(this));
+
+      this.on('Compagnon:itemAdded', function (newindex) {
+        this.workspace.currentIndex = this.currentIndex = newindex;
+        this.actions.push({ action : "add", index : newindex});
+        this.actions.push({ action : "update", type : "drawing"})
+      }.bind(this))
+
+      this.on('Compagnon:itemDeleted', function (newindex) {
+        this.workspace.currentIndex = this.currentIndex = newindex;
+        this.actions.push({ action : "delete"});
+      })
 
       this.on('compagnon:swap', function () {// Va surement être rendu obsolète par workspace:swap
         this.workspace.item.swap();
@@ -69,16 +76,26 @@ sand.define('Compagnon/Compagnon', ['Compagnon/*','DOM/handle','PrototypeExtensi
       if(this.actions) {
         this.cancel++
         var actionToCancel = this.actions[this.actions.length - 1 - this.cancel];
-        if(actionToCancel.action === 'update' )this.workspace.update(actionToCancel.type,actionToCancel.data,actionToCancel.index,actionToCancel.legend,true);
+        if(actionToCancel.action === 'update' ) this.workspace.update(actionToCancel.type,actionToCancel.data,actionToCancel.index,actionToCancel.legend,true);
+        else if (actionToCancel.action === 'add') this.delete(true);
+        else if (actionToCancel.action === 'delete') this.add(null,null,true);
         this.fire('compagnon:undo');
       }
     },
 
     redo : function () {//actions à rétablir à spécifier
+      if(this.actions) {
+        this.cancel--
+        var actionToCancel = this.actions[this.actions.length - 1 - this.cancel];
+        if(actionToCancel.action === 'update' )this.workspace.update(actionToCancel.type,actionToCancel.data,actionToCancel.index,actionToCancel.legend,true);
+        else if (actionToCancel.action === 'add') this.add(null,null,true);
+        else if (actionToCancel.action === 'delete') this.delete(true);
+      }
       this.fire('compagnon:redo');
     },
 
-    delete : function () {
+    delete : function (cancel) {
+      console.log('delete');
       this.topBar.ressources[this.currentIndex].el.parentNode.removeChild(this.topBar.ressources[this.currentIndex].el);
       var daddy = this.workspace.items[this.currentIndex].el.parentNode;
       daddy.removeChild(this.workspace.items[this.currentIndex].el);
@@ -89,24 +106,26 @@ sand.define('Compagnon/Compagnon', ['Compagnon/*','DOM/handle','PrototypeExtensi
       for (var i = 0, n = this.topBar.ressources.length; i < n; i++) {
         this.topBar.ressources[i].el.addEventListener("mousedown", function (i) {
           this.currentIndex = i;
+          this.select(i)
         }.bind(this).curry(i));
       }
       
       if(this.currentIndex >= this.topBar.ressources.length) this.currentIndex--;
       if(this.workspace.items) daddy.appendChild(this.workspace.items[this.currentIndex].el);
       
-      this.fire('Compagnon:itemDeleted',this.currentIndex);
+      if(!cancel) this.fire('Compagnon:itemDeleted',this.currentIndex);
       this.workspace.fire('Workspace:newCurrentIndex',this.currentIndex)
     },
 
-    add : function (type,data) {
+    add : function (type,data,cancel) {
+      if(!data) var data = {};
+      if(!type) var type = "drawing";
+
       var newR = new r.Compagnon.Ressource({type : type, data : data})
       
       this.topBar.ressources.push(newR)
       this.topBar.el.children[1].appendChild(newR.el);
 
-      if(!data) data = {};
-      if(!type) type = "drawing";
       var daddy = this.workspace.items[this.currentIndex].el.parentNode;
       daddy.removeChild(this.workspace.items[this.currentIndex].el);
 
@@ -137,7 +156,7 @@ sand.define('Compagnon/Compagnon', ['Compagnon/*','DOM/handle','PrototypeExtensi
         this.topBar.ressources.el.style.backgroundImage = preview;
       }.bind(this))
 
-      this.fire('topBar:addedRessource',this.currentIndex);
+      if(!cancel) this.fire('Compagnon:itemAdded',this.currentIndex);
       this.workspace.fire('Workspace:newCurrentIndex',this.currentIndex)
       
     },
