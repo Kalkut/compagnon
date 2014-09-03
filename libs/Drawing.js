@@ -22,6 +22,11 @@ sand.define('Compagnon/Drawing',['Compagnon/Item','drawing/Canvas'], function (r
         this.fire('item:isDrawing', paths)
       }.bind(this));
 
+      this.canvas.el.addEventListener("mouseup", function () {
+        
+        this.fire('drawing:snapshotTaken',this.canvas.bg.toDataURL())
+      }.bind(this));
+
       this.el.appendChild(this.canvas.el);
       this.el.appendChild(this.legend);
 

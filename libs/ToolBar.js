@@ -1,6 +1,7 @@
-sand.define('Compagnon/ToolBar', function (r) {
+sand.define('Compagnon/ToolBar',['PrototypeExtensions/curry'], function (r) {
   return Seed.extend({
     '+init' : function (input) {
+      var scope = {};
       this.el = toDOM({
         tag : '.panel',
         children : [
@@ -18,9 +19,28 @@ sand.define('Compagnon/ToolBar', function (r) {
         },
         {
           tag : '.link',
+          as : "link",
           events : {
-            mousedown : this.link.bind(this),
-          }
+            mousedown : function () {
+              scope.input.style.display = "block"
+            }
+          },
+          children : [
+          {
+            tag : "input .input-field",
+            as : "input",
+            events : {
+              keyup : function (e) {
+                if(e.keyCode === 13) {
+                  this.fire('toolBar:link',scope.input.value);
+                  scope.input.style.display = "none";
+                }
+              }.bind(this)
+            },
+            style : {
+              display : "none"
+            }
+          }]
         },
         {
           tag : '.picture',
@@ -35,7 +55,11 @@ sand.define('Compagnon/ToolBar', function (r) {
           }
         }
         ]
-      })
+      },scope)
+
+      document.body.addEventListener('mousedown', function (scope) {
+        scope.input.style.display = "none";
+      }.curry(scope),true)
     },
 
     drawing : function () {
@@ -44,10 +68,6 @@ sand.define('Compagnon/ToolBar', function (r) {
 
     upload : function () {
       this.fire('toolBar:upload',type);
-    },
-
-    link : function () {
-      this.fire('toolBar:link',type);
     },
 
     picture : function () {

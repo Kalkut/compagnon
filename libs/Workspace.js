@@ -4,63 +4,54 @@ sand.define('Compagnon/Workspace',['Compagnon/ToolBar','Compagnon/Drawing','Comp
       this.toolBar = new r.ToolBar();
       
       this.toolBar.on('toolBar:drawing', function () {
-        this.update(this.currentType,"drawing");
-
+        this.update('drawing',this.input);
       }.bind(this));
 
       this.toolBar.on('toolBar:picture', function () {
-        this.update(this.currentType,"image");
-        this.currentType = "image";
         this.fire('workspace:toolBar:picture');
       }.bind(this));
 
-      this.toolBar.on('toolBar:upload', function (type) {
-        this.update(this.currentType,type);
-        this.currentType = type;
-        this.fire('workspace:toolBar:upload',type);
+      this.toolBar.on('toolBar:upload', function (file) {
+        this.fire('workspace:toolBar:upload',file);
       }.bind(this));
 
-      this.toolBar.on('toolBar:link', function (type) {
-        this.update(this.currentType,type);
-        this.currentType = type;
-        this.fire('workspace:toolBar:link',type);
+      this.toolBar.on('toolBar:link', function (link) {
+        this.input.link = link;
+        this.fire('workspace:toolBar:link',link);
+        if(link.search('youtube.') !== -1 || link.search('vimeo.') !== -1) {
+          this.update('video',this.input)
+        }else if (link.search('.png') !== link.length - 4 || link.search('.jpg') !== link.length - 4 || link.search('.jpeg') !== link.length - 5 || link.search('.gif') !== link.length - 4) {
+          this.update('image',this.input)
+        }
       }.bind(this));
 
-      this.toolBar.on('toolBar:video', function () {
-        this.update(this.currentType,"video");
-        this.currentType = "video"
-        this.fire('workspace:toolBar:video');
-      }.bind(this))
 
       this.toolBar.on('toolBar:trash', function () {
         this.fire('workspace:toolBar:trash');
       }.bind(this))
 
+      this.on('Workspace:newCurrentIndex', function (index) {
+        this.currentIndex = index
+      }.bind(this))
+
       input ? this.input = jQuery.extend({},input) : this.input = {};
       this.input.type ? this.currentType = this.input.type : this.currentType = "drawing"; 
+
+      this.input.currentIndex >= 0 ? this.currentIndex = this.input.currentIndex : this.currentIndex = 0;
       
       if(!this.input.paths) this.input.paths = [];
-      
-      this.item = { 
-        drawing : new r.Drawing(input), 
-        video : new r.Video(input), 
-        url : new r.Url(input), 
-        image : new r.Image(input)
-      };
 
-      for (var type in this.item) {
-        this.item[type].on('item:legendUpdated', function (legend) {
+      this.hashTypes = { drawing : "Drawing", video : "Video", image : "Image", url : "Url" };
+
+      this.items = this.input.items || [new r[this.hashTypes[this.currentType]](input)];
+      this.itemsHtml = [];
+      
+      for(var h = 0, len = this.items.length; h < len; h++) {
+        this.itemsHtml.push(this.items[h].el);
+        this.items[h].on('item:legendUpdated', function (legend) {
           this.input.legend = legend;
         }.bind(this))
-        if (type !== this.currentType) {
-          this.item[type].hide();
-        }
-        else this.item[type].show();
-      } 
-
-      this.item.drawing.on('item:isDrawing', function (path) {
-        this.input.paths.push(path);
-      }.bind(this));
+      }
 
       this.switchPicto = toDOM({
         tag : '.switch',
@@ -73,42 +64,29 @@ sand.define('Compagnon/Workspace',['Compagnon/ToolBar','Compagnon/Drawing','Comp
         this.switchPicto,
         {
           tag : '.workspace',
-          children : [
-            this.item.drawing.el,
-            this.item.video.el,
-            this.item.url.el,
-            this.item.image.el
-          ]
+          children : this.itemsHtml
         }]
       })
 
-      this.hashTypes = { drawing : "Drawing", video : "Video", image : "Image", url : "Url" };
-
     },
 
-    update : function (type) {
+    update : function (type,data) {
+      if(type){
+        if(!data) data = {};
+        var daddy = this.items[this.currentIndex].el.parentNode;
+        var legend = this.items[this.currentIndex].legend.innerHTML;
+        daddy.removeChild(this.items[this.currentIndex].el);
+        this.items[this.currentIndex] = this.create(r[this.hashTypes[type]],data);
+        daddy.appendChild(this.items[this.currentIndex].el);
+        this.items[this.currentIndex].legend.innerHTML = legend;
 
-      console.log(this.input.paths);
-      var daddy = this.item[type].el.parentNode;
-      daddy.removeChild(this.item[type].el);
-      
-      this.item[this.currentType].hide();
-      this.item[type] = this.item[this.currentType].create(r[this.hashTypes[type]],this.input);
-
-      if(type === "drawing") {
-        this.item.drawing.on('item:isDrawing', function (path) {
-          this.input.paths.push(path);
-        }.bind(this));
+        this.fire('workspace:updated',this.currentIndex);
       }
+    },
 
-
+    addItem : function (type,data) {
       
-      daddy.appendChild(this.item[type].el);
-      this.item[type].show();
-      
-      this.currentType = type;
-      this.fire('workspace:update');
-    }
+    },
 
   })
 })

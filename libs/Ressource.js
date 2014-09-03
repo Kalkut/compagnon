@@ -5,7 +5,7 @@ sand.define('Compagnon/Ressource', function (r) {
         tag : '.item',
       })
 
-      this.type = input ? (input.type ? input.type : 'item') : 'item';
+      this.type = input ? (input.type ? input.type : 'drawing') : 'drawing';
       this.preview;
 
 
