@@ -5,8 +5,8 @@ sand.define('Compagnon/Image',['Compagnon/Item','Case'], function (r) {
       this.el.className += " image";
 
       this.imgCase = new r.Case({
-        width : window.innerWidth*0.676, 
-        height : window.innerHeight*0.353,
+        width : window.innerWidth*0.48, 
+        height : window.innerHeight*0.366,
         imgSrc : input.link || '',
         type : 'img'
       });

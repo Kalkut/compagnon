@@ -8,6 +8,7 @@ sand.define('Compagnon/Compagnon', ['Compagnon/*','DOM/handle','PrototypeExtensi
       this.currentIndex = input.currentIndex || 0;
       this.actions = [{ action : "update", type : "drawing"}];
       this.cancel = 0;
+      this.topBar.ressources[this.currentIndex].el.className+= " selected";
       
 
       this.el = toDOM({
@@ -142,8 +143,8 @@ sand.define('Compagnon/Compagnon', ['Compagnon/*','DOM/handle','PrototypeExtensi
       var newIndice = this.topBar.ressources.length - 1;
       
       newR.el.addEventListener("mousedown", function () {
-        this.select(newIndice);
-        this.currentIndex = newIndice;
+        this.select(k);
+        this.currentIndex = k;
       }.bind(this));
 
       r.handle(newR.el).drag({

@@ -3,8 +3,8 @@ sand.define('Compagnon/Video',['Compagnon/Item'], function (r) {
     '+init' : function (input) {
       this.type = "video";
       this.el.className += " video";
-      this.width = window.innerWidth*0.676; 
-      this.height = window.innerHeight*0.353;
+      this.width = window.innerWidth*0.48; 
+      this.height = window.innerHeight*0.366;
       this.link = input.link || '';
 
       this.patterns = {

@@ -1,25 +1,20 @@
 body{
   width: 100%;
   height: 100%;
-  padding: 0px;
   background-image: url('/pattern.png');
-  margin: 0px;
+  margin: 0%;
 }
 
 
 .header {
-  height: 4.854368932038835%;
+  height: 5%;
   background-image: url('camo.png');
-  margin-bottom: 35px;
 }
 
 
 .items-block {
-  margin: 0% 0% 1% 2%;
-  width: 100%;
-  position: relative;
-  height : 8.5%;
-  top: 40px;
+  height : 7%;
+  margin-top : 9%
 }
 
 .select{
@@ -30,9 +25,14 @@ body{
   background-size:contain;
 }
 
+.actions {
+  height: 3.1067961165048542%;
+  width: 15%;
+  position: absolute;
+  top: 22.5%;
+}
+
 .items{
-  width: 100%;
-  height: 76.36363636363636%;
 }
 
 .actions .new {
@@ -63,52 +63,38 @@ body{
   background-image: url('drawing.png');
   background-repeat:no-repeat;
   background-size:contain;
-  top : 32%;
-  position: relative;
 }
 
 .panel .upload {
   background-image: url('upload.png'); 
   background-repeat:no-repeat;
   background-size:contain;
-  top : 32%;
-  position: relative;
 }
 
 .panel .link {
   background-image: url('link.png');
   background-repeat:no-repeat;
   background-size:contain;
-  top : 32%;
-  position: relative;
 }
 
 .panel .picture {
   background-image: url('camera.png');
   background-repeat:no-repeat;
   background-size:contain;
-  top : 32%;
-  position: relative;
 }
 
 .panel .delete {
   background-image: url('trash.png');
   background-repeat:no-repeat;
   background-size:contain;
-  bottom: 0px;
-  position: absolute;
 }
 
 .mini-item {
-  /*height : 6.796116504854369%;
-  width: 8.333333333333333%;
-  position : absolute;*/
-  position: relative;
   width: 8.5%;
   height: 100%;
+  top : 0%;
   float: left;
-  padding-right: 1%;
-  margin-right: 1%;
+  margin-right : 1%;
   background-color: #FFFFFF;
   background-repeat: no-repeat;
 }
@@ -122,10 +108,19 @@ body{
 }
 
 .workspace {
-  left: 6.5%;
-  position: absolute;
-  width: 89.5%;
-  height: 73.7%;
+    left: 5%;
+    width: 95%;
+    height: 100%;
+    position: absolute;
+    padding: 10% 0% 0% 18%;
+    -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box;
+}
+
+.edit {
+  position : absolute;
+  bottom : 0%;
+  height: 72%;
+  width: 100%;
 }
 
 .item.video,.item.url{
@@ -135,23 +130,19 @@ body{
 }
 
 .item.image,.item.drawing,.item.video {
-  padding: 2.7253669% 2.2312373% 2.7253669% 2.4340771%;
-  width: 80%;
-  height: 100%;
-  margin : 10% 0% 5% 10%;
+  padding: 2.7% 2.2% 2.7% 2.4%;
+  width: 55%;
+  height: 65%;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
   border-radius: 11px;
   background-color: #FFFFFF;
+  margin: 0%;
+  position: absolute;
 }
 
-.actions {
-  height: 3.1067961165048542%;
-  width: 15%;
-  position: relative;
-  top: 50;
-}
+
 
 .actions .new, .actions .undo,.actions .redo {
   height: 100%;
@@ -159,12 +150,7 @@ body{
   float: left;
 }
 
-.edit {
-  height: 75%;
-  width: 100%;
-  position: absolute;
-  bottom: 0px;
-}
+
 
 .panel {
   float: left;
@@ -175,20 +161,19 @@ body{
 .panel div {
   width: 100%;
   height: 5.037783375314862%;
+  top: 28%;
+  position: relative;
 }
 
 
 .image .legend,.drawing .legend,.video .legend {
   width: 100%;
   height: 10%;
-  float: left;
-  position: relative;
-  margin-top: 10%;
   outline: none;;
+  margin-top: 6%;
 }
 
 .image .legend{
-  top: 361.472px;
 }
 
 .image .case,.drawing-canvas,.iframe{
@@ -196,21 +181,3 @@ body{
   border-bottom-style: solid;
   border-bottom-color: #408486;
 }
-
-
-/*.input-field{
-  position: absolute;
-  left: 5%;
-  top: 0px;
-  display: none;
-  background-color: transparent;
-  padding: 0 5px;
-  font-family: proxima-light;
-  font-size: 13px;
-  color: white;
-  height: 10px;
-  line-height: 15px;
-  width: 250px;
-  border-left: 2px solid white;
-  margin: 8px 0 0 5px;
-}*/
