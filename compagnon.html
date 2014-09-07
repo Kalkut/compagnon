@@ -50,7 +50,7 @@
 
   sand.require('Compagnon/*','Drawing/*', function (r) {
     //console.log(r)
-    b = new r.Compagnon.Compagnon({});
+    b = new r.Compagnon.Compagnon({ "data" : [{ "type" : "video", "legend" : "lol", "link" : "https://www.youtube.com/watch?v=z2exxj4COhU" },{ "type" : "image", "legend" : "yeah", "link" : "http://rodrigonzalez01.files.wordpress.com/2012/02/yeah1.jpg" }]});
     document.body.appendChild(b.el);
   })
   </script>

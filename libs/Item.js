@@ -17,7 +17,7 @@ sand.define('Compagnon/Item', function (r) {
           contenteditable : true,
         },
         events : {
-          keyup : function () {
+          keyup : function (e) {
             if(this.actions && this.cancel) {
               for(var i = 0; i <= this.cancel; i++ ) {
                 this.actions.pop();
@@ -29,10 +29,15 @@ sand.define('Compagnon/Item', function (r) {
           blur : function () {
             this.actions.push('type');
           }.bind(this),
+          keydown : function (e) {
+            if (e.keyCode === 13) {
+              document.execCommand('insertHTML', false, '<br><br>');
+              return false;
+            } 
+          }
         },
         innerHTML : this.input.legend || ""
       })
-
     },
 
     swap : function (type) {// Va être rendu obsolète par workspace:swap

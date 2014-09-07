@@ -8,8 +8,8 @@ sand.define('Compagnon/TopBar',['Compagnon/Ressource','DOM/handle'], function  (
 
   return Seed.extend({
     '+init' : function (input) {
-      this.ressources = input ? (input.ressources ? input.type : [new r.Ressource()]) : [new r.Ressource()];
-      this.currentIndex = input ? (input.index ? input.index : 0 ) :  0;
+      this.ressources = [];
+      this.currentIndex = input ? (input.currentIndex ? input.currentIndex : 0 ) :  0;
       this.scope = {}
       this.el = toDOM({
         tag : '.items-block',
@@ -22,7 +22,7 @@ sand.define('Compagnon/TopBar',['Compagnon/Ressource','DOM/handle'], function  (
         }]
       },this.scope)
 
-      for (var i = 0, n = this.ressources.length; i < n; i++) {
+      /*for (var i = 0, n = this.ressources.length; i < n; i++) {
         this.scope.items.appendChild(this.ressources[i].el);
         
         
@@ -45,10 +45,11 @@ sand.define('Compagnon/TopBar',['Compagnon/Ressource','DOM/handle'], function  (
           this.currentIndex = i;
         }.bind(this).curry(i));
 
-      }
+      }*/
 
 
 
     },
+
   })
 })

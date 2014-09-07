@@ -35,7 +35,7 @@ sand.define('Compagnon/Workspace',['Compagnon/ToolBar','Compagnon/Drawing','Comp
       }.bind(this))
 
       input ? this.input = jQuery.extend({},input) : this.input = {};
-      this.input.type ? this.currentType = this.input.type : this.currentType = "drawing"; 
+      //this.input.data && this.input.data.type ? this.currentType = this.input.data.type : this.currentType = "drawing"; 
 
       this.input.currentIndex >= 0 ? this.currentIndex = this.input.currentIndex : this.currentIndex = 0;
       
@@ -43,7 +43,7 @@ sand.define('Compagnon/Workspace',['Compagnon/ToolBar','Compagnon/Drawing','Comp
 
       this.hashTypes = { drawing : "Drawing", video : "Video", image : "Image", url : "Url" };
 
-      this.items = this.input.items || [new r[this.hashTypes[this.currentType]](input)];
+      this.items = this.input.items || [/*new r[this.hashTypes[this.currentType]](input)*/];
       this.itemsHtml = [];
       
       for(var h = 0, len = this.items.length; h < len; h++) {
@@ -64,7 +64,12 @@ sand.define('Compagnon/Workspace',['Compagnon/ToolBar','Compagnon/Drawing','Comp
         this.switchPicto,
         {
           tag : '.workspace',
-          children : this.itemsHtml
+          children : [
+            {
+            tag : '.container',
+            children : this.itemsHtml
+            }
+          ]
         }]
       })
 
@@ -75,13 +80,14 @@ sand.define('Compagnon/Workspace',['Compagnon/ToolBar','Compagnon/Drawing','Comp
         if(!data) var data = {};
         if(!index) var index = this.currentIndex;
         if(!legend) var legend = this.items[index].legend.innerHTML || "";
+        var oldType = this.items[index].type;
         var daddy = this.items[index].el.parentNode;
         daddy.removeChild(this.items[index].el);
         this.items[index] = this.create(r[this.hashTypes[type]],data);
         daddy.appendChild(this.items[index].el);
         this.items[index].legend.innerHTML = legend;
         this.input.legend = legend;
-        if(!cancel) this.fire('workspace:updated',this.currentIndex,type,jQuery.extend({},data),legend);
+        if(!cancel) this.fire('workspace:updated',this.currentIndex,type,jQuery.extend({},data),legend,oldType);
       }
     },
 

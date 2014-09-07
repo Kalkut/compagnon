@@ -1,14 +1,15 @@
 sand.define('Compagnon/Compagnon', ['Compagnon/*','DOM/handle','PrototypeExtensions/curry'], function (r) {
   return Seed.extend({
     '+init' : function (input) {
-      this.actionBar = new r.Compagnon.ActionBar(input);
-      this.banner = new r.Compagnon.Banner(input);
-      this.topBar = new r.Compagnon.TopBar(input);
-      this.workspace =  new r.Compagnon.Workspace(input);
-      this.currentIndex = input.currentIndex || 0;
-      this.actions = [{ action : "update", type : "drawing"}];
+      input ? this.input = jQuery.extend({},input) : this.input = { "data" : []} 
+      this.actionBar = new r.Compagnon.ActionBar(this.input);
+      this.banner = new r.Compagnon.Banner(this.input);
+      this.topBar = new r.Compagnon.TopBar(this.input);
+      this.workspace =  new r.Compagnon.Workspace(this.input);
+      this.currentIndex = this.input.currentIndex || 0;
+      this.actions = [/*{ action : "update", type : "drawing"}*/];
       this.cancel = 0;
-      this.topBar.ressources[this.currentIndex].el.className+= " selected";
+      this.defaultType = this.input.defaultType || "drawing";
       
 
       this.el = toDOM({
@@ -40,8 +41,9 @@ sand.define('Compagnon/Compagnon', ['Compagnon/*','DOM/handle','PrototypeExtensi
         this.delete();
       }.bind(this))
 
-      this.workspace.on('workspace:updated', function (index,type,data,legend) {
-        this.actions.push({ action : "update", type : type, data : data, legend : legend});
+      this.workspace.on('workspace:updated', function (index,type,data,legend,oldType) {
+        this.cancel = 0;
+        this.actions.push({ action : "update", type : type,oldType : oldType, data : data, legend : legend});
         this.workspace.items[index].on('Item:snapshotTaken', function (preview) {
           this.topBar.ressources[index].el.style.backgroundImage = "url(\"" + preview + "\")";
         }.bind(this))
@@ -49,19 +51,19 @@ sand.define('Compagnon/Compagnon', ['Compagnon/*','DOM/handle','PrototypeExtensi
         if(this.workspace.items[index].preview) this.workspace.items[index].fire('Item:snapshotTaken',this.workspace.items[index].preview);
       }.bind(this));
 
-      this.on('Compagnon:itemAdded', function (newindex) {
+      this.on('Compagnon:itemAdded', function (newindex,type,data) {
         this.workspace.currentIndex = this.currentIndex = newindex;
-        this.actions.push({ action : "add", index : newindex});
-        this.actions.push({ action : "update", type : "drawing"})
+        this.actions.push({ action : "add", index : newindex, type : type, data : data, legend : data.legend});
+        //this.actions.push({ action : "update", type : "drawing"})
       }.bind(this))
 
-      this.on('Compagnon:itemDeleted', function (newindex) {
+      this.on('Compagnon:itemDeleted', function (newindex,data,type) {
         this.workspace.currentIndex = this.currentIndex = newindex;
-        this.actions.push({ action : "delete"});
+        this.actions.push({ action : "delete", data : data, type : type});
       })
 
-      this.on('compagnon:swap', function () {// Va surement être rendu obsolète par workspace:swap
-        this.workspace.item.swap();
+      this.on('compagnon:sync', function () {
+        
       }.bind(this))
 
 
@@ -77,30 +79,41 @@ sand.define('Compagnon/Compagnon', ['Compagnon/*','DOM/handle','PrototypeExtensi
         }.bind(this).curry(k))
       }
 
+      if(this.input.data.length) {
+        for(var sInd = 0, eInd = this.input.data.length; sInd < eInd; sInd++ ) {
+          this.add(this.input.data[sInd].type,this.input.data[sInd]);
+          this.workspace.items[this.workspace.items.length - 1].fire('Item:snapshotTaken', this.workspace.items[this.workspace.items.length - 1].preview)
+        }
+        this.uncancelableActions = eInd;
+      }else {
+        this.add(this.defaultType, null);
+      }
     },
 
-    swap : function () {
-      this.fire('compagnon:swap');
+    sync : function () {
+      console.log(this.workspace.items[this.currentIndex],this.workspace.input);
+      this.fire('compagnon:sync',this.workspace.items[this.currentIndex],this.workspace.input);
     },
 
     undo : function () { //actions à annuler à spécifier
-      if(this.actions) {
+      if(this.actions && this.cancel < this.actions.length - this.uncancelableActions) {
         this.cancel++
-        var actionToCancel = this.actions[this.actions.length - 1 - this.cancel];
-        if(actionToCancel.action === 'update' ) this.workspace.update(actionToCancel.type,actionToCancel.data,actionToCancel.index,actionToCancel.legend,true);
+        var actionToCancel = this.actions[this.actions.length - this.cancel];
+        if(actionToCancel.action === 'update' ) this.workspace.update(actionToCancel.oldType,actionToCancel.data,actionToCancel.index,actionToCancel.legend,true);
         else if (actionToCancel.action === 'add') this.delete(true);
-        else if (actionToCancel.action === 'delete') this.add(null,null,true);
+        else if (actionToCancel.action === 'delete') this.add(actionToCancel.type,actionToCancel.data,true);
         this.fire('compagnon:undo');
       }
     },
 
     redo : function () {//actions à rétablir à spécifier
-      if(this.actions) {
-        this.cancel--
-        var actionToCancel = this.actions[this.actions.length - 1 - this.cancel];
+      if(this.actions && this.cancel >= 1) {
+        var actionToCancel = this.actions[this.actions.length - this.cancel];
         if(actionToCancel.action === 'update' ) this.workspace.update(actionToCancel.type,actionToCancel.data,actionToCancel.index,actionToCancel.legend,true);
-        else if (actionToCancel.action === 'add') this.add(null,null,true);
+        else if (actionToCancel.action === 'add') this.add(actionToCancel.type,actionToCancel.data,true);
         else if (actionToCancel.action === 'delete') this.delete(true);
+
+        this.cancel--
       }
       this.fire('compagnon:redo');
     },
@@ -109,6 +122,8 @@ sand.define('Compagnon/Compagnon', ['Compagnon/*','DOM/handle','PrototypeExtensi
       console.log('delete');
       this.topBar.ressources[this.currentIndex].el.parentNode.removeChild(this.topBar.ressources[this.currentIndex].el);
       var daddy = this.workspace.items[this.currentIndex].el.parentNode;
+      var data = this.workspace.items[this.currentIndex].input;
+      var type = this.workspace.items[this.currentIndex].type
       daddy.removeChild(this.workspace.items[this.currentIndex].el);
 
       this.topBar.ressources.splice(this.currentIndex,1);
@@ -124,7 +139,7 @@ sand.define('Compagnon/Compagnon', ['Compagnon/*','DOM/handle','PrototypeExtensi
       if(this.currentIndex >= this.topBar.ressources.length) this.currentIndex--;
       if(this.workspace.items) daddy.appendChild(this.workspace.items[this.currentIndex].el);
       
-      if(!cancel) this.fire('Compagnon:itemDeleted',this.currentIndex);
+      if(!cancel) this.fire('Compagnon:itemDeleted',this.currentIndex,data,type);
       this.workspace.fire('Workspace:newCurrentIndex',this.currentIndex)
     },
 
@@ -137,17 +152,18 @@ sand.define('Compagnon/Compagnon', ['Compagnon/*','DOM/handle','PrototypeExtensi
       this.topBar.ressources.push(newR)
       this.topBar.el.children[1].appendChild(newR.el);
 
-      var daddy = this.workspace.items[this.currentIndex].el.parentNode;
-      daddy.removeChild(this.workspace.items[this.currentIndex].el);
+      if(this.workspace.items[this.currentIndex]) {// if no item declared remove nothing
+        var daddy = this.workspace.items[this.currentIndex].el.parentNode;
+        daddy.removeChild(this.workspace.items[this.currentIndex].el);
+      } else {
+        var daddy = this.workspace.el.children[2].children[0];
+      }
 
       var newIndice = this.topBar.ressources.length - 1;
       
-      newR.el.addEventListener("mousedown", function () {
-        this.select(k);
-        this.currentIndex = k;
-      }.bind(this));
+      
 
-      r.handle(newR.el).drag({
+      /*r.handle(newR.el).drag({
         start : function(e) {
         }.wrap(this),
 
@@ -158,7 +174,7 @@ sand.define('Compagnon/Compagnon', ['Compagnon/*','DOM/handle','PrototypeExtensi
 
         end : function(e) {
         }.wrap(this)
-      })
+      })*/
 
       this.currentIndex = newIndice;
       this.workspace.items.push(new r.Compagnon[this.workspace.hashTypes[type]](data));
@@ -168,7 +184,15 @@ sand.define('Compagnon/Compagnon', ['Compagnon/*','DOM/handle','PrototypeExtensi
           this.topBar.ressources[this.currentIndex].el.style.backgroundImage = "url(\"" + preview + "\")";
       }.bind(this))
 
-      if(!cancel) this.fire('Compagnon:itemAdded',this.currentIndex);
+      newR.el.addEventListener("mousedown", function () {
+        this.select(newIndice);
+        this.currentIndex = newIndice;
+      }.bind(this));
+
+      if(!cancel) {
+        this.cancel = 0
+        this.fire('Compagnon:itemAdded',this.currentIndex,type,data);
+      }
       this.workspace.fire('Workspace:newCurrentIndex',this.currentIndex)
       
     },

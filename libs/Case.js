@@ -39,7 +39,7 @@ sand.define('Case',["Geo/*"], function (r) {
 			this.div = toDOM({
 				tag : 'div.' + (options.prefix ? (options.prefix + "-") : "") + "case",
 				style : {
-					position : "absolute",
+					/*position : "absolute",*/
 					overflow : "hidden",
 					width : options.width,
 					height : options.height,
