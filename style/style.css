@@ -13,16 +13,15 @@ body{
 
 
 .items-block {
-  height : 7%;
-  margin-top : 9%
-;
+  height: 7%;
+  width: 100%;
   left: 1.5%;
-  position: relative;
+  position: absolute;
+  top: 14%;
 }
 
 .select{
   height : 32%;
-  width: 12%;
   background-image: url('select.png');
   background-repeat:no-repeat;
   background-size:contain;
@@ -38,7 +37,7 @@ body{
 
 .items{
     position: relative;
-    height: 100%;
+    height: 68%;
 }
 
 .actions .new {
