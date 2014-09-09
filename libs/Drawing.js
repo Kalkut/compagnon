@@ -38,9 +38,39 @@ sand.define('Compagnon/Drawing',['Compagnon/Item','drawing/Canvas'], function (r
         this.fire('Item:snapshotTaken',this.canvas.bg.toDataURL())
       }.bind(this));
 
+      this.undoRedoClear = toDOM({
+        tag : '.undo-redo-clear',
+        children : [
+        {
+          tag : '.drawing-undo',
+          events : {
+            mousedown : function () {
+              this.canvas.undo();
+            }.bind(this)
+          }
+        },
+        {
+          tag : '.drawing-redo',
+          events : {
+            mousedown : function () {
+              this.canvas.redo();
+            }.bind(this)
+          }
+        },
+        {
+          tag : '.drawing-clear',
+          events : {
+            mousedown : function () {
+              this.canvas.clear();
+            }.bind(this)
+          }
+        }]
+      })
+
+      this.canvas.el.appendChild(this.undoRedoClear);
       this.el.appendChild(this.canvas.el);
       this.el.appendChild(this.legend);
-      this.preview = this.canvas.bg.toDataURL()
+      this.preview = this.canvas.bg.toDataURL();
     },
 
     undo : function () {

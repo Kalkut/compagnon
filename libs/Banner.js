@@ -44,6 +44,11 @@ sand.define('Compagnon/Banner', function (r) {
         },
         {
           tag : '.sync',
+          events : {
+            mousedown : function () {
+              this.sync();
+            }.bind(this)
+          }
         }]
       })
     },
@@ -72,8 +77,8 @@ sand.define('Compagnon/Banner', function (r) {
       this.fire('banner:logout');
     },
 
-    synchronize : function () {
-      this.fire('banner:synchronize');
+    sync : function () {
+      this.fire('banner:sync');
     },
   })
 })

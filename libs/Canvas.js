@@ -164,22 +164,26 @@ sand.define('drawing/Canvas',['drawing/Buttons'], function (req) {
      },
 
      undo : function () {
-
       if (this.paths.length && this.cancel) {
        this.cancel--;
        this.bg_ctx.clearRect(0, 0, this.bg.width, this.bg.height);
        this.fg_ctx.clearRect(0, 0, this.fg.width, this.fg.height);
        for (var i = 0; i < this.cancel; i++){
-        trace(this.bg,this.paths[i])
+        console.log(this.paths[i])
+        if(this.paths[i] === "clear") {
+          this.bg_ctx.clearRect(0, 0, this.bg.width, this.bg.height);
+          this.fg_ctx.clearRect(0, 0, this.fg.width, this.fg.height); 
+        }else trace(this.bg,this.paths[i]);
       }
     };
-    console.log(this.paths)
-    console.log(this.cancel)
   },
 
   redo : function () {
     if (this.cancel < this.paths.length) {
-      trace(this.bg,this.paths[this.cancel]);
+      if(this.paths[this.cancel] === "clear") {
+          this.bg_ctx.clearRect(0, 0, this.bg.width, this.bg.height);
+          this.fg_ctx.clearRect(0, 0, this.fg.width, this.fg.height); 
+        }else trace(this.bg,this.paths[this.cancel]);
       this.cancel++;
     };
     console.log(this.paths);
@@ -189,6 +193,9 @@ sand.define('drawing/Canvas',['drawing/Buttons'], function (req) {
   clear : function () {
     this.bg_ctx.clearRect(0, 0, this.bg.width, this.bg.height);
     this.fg_ctx.clearRect(0, 0, this.fg.width, this.fg.height);
+    this.paths.push("clear");
+    this.cancel = this.paths.length;
+    console.log(this.paths);
   },
 
   setToolAt : function(tool){

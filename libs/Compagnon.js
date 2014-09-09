@@ -28,6 +28,9 @@ sand.define('Compagnon/Compagnon', ['Compagnon/*','DOM/handle','PrototypeExtensi
         //MUST ADD ITEM IN WORKSPACE
       }.bind(this))
 
+      this.banner.on('banner:sync', function () {
+        this.sync();
+      }.bind(this));
 
       this.actionBar.on('actionBar:undo', function () {
         this.undo();
@@ -73,10 +76,10 @@ sand.define('Compagnon/Compagnon', ['Compagnon/*','DOM/handle','PrototypeExtensi
           this.topBar.ressources[k].el.style.backgroundImage = "url(\"" + preview + "\")";
         }.bind(this).curry(k))
         
-        this.topBar.ressources[k].el.addEventListener("mousedown", function (k) {
+        /*this.topBar.ressources[k].el.addEventListener("mousedown", function (k) {
           this.select(k);
           this.currentIndex = k;
-        }.bind(this).curry(k))
+        }.bind(this).curry(k))*/
       }
 
       if(this.input.data.length) {
@@ -91,8 +94,9 @@ sand.define('Compagnon/Compagnon', ['Compagnon/*','DOM/handle','PrototypeExtensi
     },
 
     sync : function () {
-      console.log(this.workspace.items[this.currentIndex],this.workspace.input);
-      this.fire('compagnon:sync',this.workspace.items[this.currentIndex],this.workspace.input);
+      var currentItem = this.workspace.items[this.currentIndex];
+      console.log({el : currentItem.el, type : currentItem.type, legend : currentItem.input.legend, link : currentItem.input.link, preview : currentItem.preview, item : currentItem});
+      this.fire('compagnon:sync',{el : currentItem.el, type : currentItem.type, legend : currentItem.input.legend, link : currentItem.input.link, preview : currentItem.preview, item : currentItem});
     },
 
     undo : function () { //actions à annuler à spécifier
@@ -130,10 +134,10 @@ sand.define('Compagnon/Compagnon', ['Compagnon/*','DOM/handle','PrototypeExtensi
       this.workspace.items.splice(this.currentIndex,1);
 
       for (var i = 0, n = this.topBar.ressources.length; i < n; i++) {
-        this.topBar.ressources[i].el.addEventListener("mousedown", function (i) {
+        /*this.topBar.ressources[i].el.addEventListener("mousedown", function (i) {
           this.currentIndex = i;
           this.select(i)
-        }.bind(this).curry(i));
+        }.bind(this).curry(i));*/
       }
       
       if(this.currentIndex >= this.topBar.ressources.length) this.currentIndex--;
@@ -156,26 +160,12 @@ sand.define('Compagnon/Compagnon', ['Compagnon/*','DOM/handle','PrototypeExtensi
         var daddy = this.workspace.items[this.currentIndex].el.parentNode;
         daddy.removeChild(this.workspace.items[this.currentIndex].el);
       } else {
-        var daddy = this.workspace.el.children[2].children[0];
+        var daddy = this.workspace.el.children[2];
       }
 
       var newIndice = this.topBar.ressources.length - 1;
       
       
-
-      /*r.handle(newR.el).drag({
-        start : function(e) {
-        }.wrap(this),
-
-        drag : function(e) {
-          newR.el.style.left = e.xy[0]-newR.el.clientWidth/2;
-          //newR.el.style.top = e.xy[1];
-        }.wrap(this),
-
-        end : function(e) {
-        }.wrap(this)
-      })*/
-
       this.currentIndex = newIndice;
       this.workspace.items.push(new r.Compagnon[this.workspace.hashTypes[type]](data));
       daddy.appendChild(this.workspace.items[this.currentIndex].el);
@@ -184,10 +174,10 @@ sand.define('Compagnon/Compagnon', ['Compagnon/*','DOM/handle','PrototypeExtensi
           this.topBar.ressources[this.currentIndex].el.style.backgroundImage = "url(\"" + preview + "\")";
       }.bind(this))
 
-      newR.el.addEventListener("mousedown", function () {
+      /*newR.el.addEventListener("mousedown", function () {
         this.select(newIndice);
         this.currentIndex = newIndice;
-      }.bind(this));
+      }.bind(this));*/
 
       if(!cancel) {
         this.cancel = 0
@@ -202,6 +192,7 @@ sand.define('Compagnon/Compagnon', ['Compagnon/*','DOM/handle','PrototypeExtensi
       daddy.removeChild(this.workspace.items[this.currentIndex].el);
       daddy.appendChild(this.workspace.items[index].el);
       this.currentIndex = index;
+      console.log('select')
     },
 
     swap : function (firstIndex,secondIndex) {

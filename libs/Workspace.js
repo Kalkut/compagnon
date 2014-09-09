@@ -64,12 +64,12 @@ sand.define('Compagnon/Workspace',['Compagnon/ToolBar','Compagnon/Drawing','Comp
         this.switchPicto,
         {
           tag : '.workspace',
-          children : [
+          children : /*[
             {
             tag : '.container',
-            children : this.itemsHtml
-            }
-          ]
+            children : */this.itemsHtml
+            /*}
+          ]*/
         }]
       })
 

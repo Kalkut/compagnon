@@ -13,14 +13,15 @@ sand.define('Compagnon/Ressource',['DOM/handle'], function (r) {
         }
       })
 
+      console.log(this.el);
       r.handle(this.el).drag({
               start : function(e) {
                 console.log("we are here !")
-              }.wrap(this),
+              },
 
               drag : function(e) {
-                //this.el.style.left = e.xy[0]-this.el.clientWidth/2;
-              }.wrap(this),
+                this.el.style.left = e.xy[0]-this.el.clientWidth/2 + 'px';
+              }.bind(this),
 
               end : function(e) {
               }.wrap(this)

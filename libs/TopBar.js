@@ -22,33 +22,6 @@ sand.define('Compagnon/TopBar',['Compagnon/Ressource','DOM/handle'], function  (
         }]
       },this.scope)
 
-      /*for (var i = 0, n = this.ressources.length; i < n; i++) {
-        this.scope.items.appendChild(this.ressources[i].el);
-        
-        
-        var bobby = this.ressources[i].el;
-        r.handle(this.ressources[i].el).drag({
-          start : function(e) {
-          }.wrap(this),
-
-          drag : function(e) {
-            bobby.style.left = Math.max(0,e.xy[0])-bobby.clientWidth/2;
-            //bobby.style.top = e.xy[1];
-          }.wrap(this),
-
-          end : function(e) {
-           
-          }.wrap(this)
-        })
-
-        this.ressources[i].el.addEventListener("mousedown", function (i) {
-          this.currentIndex = i;
-        }.bind(this).curry(i));
-
-      }*/
-
-
-
     },
 
   })
