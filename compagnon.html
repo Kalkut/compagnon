@@ -2,7 +2,7 @@
 <head>
   <meta charset="utf-8">
   <title>Compagnon</title>
-  <link rel="stylesheet" href="/tyle.css"></link>
+  <link rel="stylesheet" href="/style.css"></link>
 </meta>
 <meta name="viewport" content="width=device-width height=device-height">
 </head>
@@ -25,7 +25,7 @@
   <script src="/Video.js"></script>
   <script src="/Url.js"></script>
   <script src="/core.min.js"></script>
-  <script src="/DOM.min.js"></script>
+  <!--<script src="/DOM.min.js"></script>-->
   <script src="/SeedWithSand.js"></script>
 
   
@@ -42,13 +42,43 @@
   <script src="/isArray.js"></script>
   <script src="/prototypes.js"></script>
 
+  <script src="/DOM/Gesture.js"></script>
+  <script src="/DOM/UA.js"></script>
+  <script src="/DOM/caretAtEnd.js"></script>
+  <script src="/DOM/createClass.js"></script>
+  <script src="/DOM/ctrlaable.js"></script>
+  <script src="/DOM/devices/Chrome.js"></script>
+  <script src="/DOM/devices/Firefox.js"></script>
+  <script src="/DOM/devices/Ipad.js"></script>
+  <script src="/DOM/devices/Opera.js"></script>
+  <script src="/DOM/devices/ie.js"></script>
+  <script src="/DOM/devices/tuio.js"></script>
+  <script src="/DOM/document.js"></script>
+  <script src="/DOM/emphasize.js"></script>
+  <script src="/DOM/fake.js"></script>
+  <script src="/DOM/getImageSize.js"></script>
+  <script src="/DOM/getPos.js"></script>
+  <script src="/DOM/getTextSize.js"></script>
+  <script src="/DOM/handle.js"></script>
+  <script src="/DOM/hexToRgb.js"></script>
+  <script src="/DOM/hsvToRgb.js"></script>
+  <script src="/DOM/lighten.js"></script>
+  <script src="/DOM/onfontsloaded.js"></script>
+  <script src="/DOM/parents.js"></script>
+  <script src="/DOM/rgbToHex.js"></script>
+  <script src="/DOM/rgbToHsv.js"></script>
+  <script src="/DOM/select.js"></script>
+  <script src="/DOM/selection.js"></script>
+  <script src="/DOM/state.js"></script>
+  <script src="/DOM/toDOM.js"></script>
+
   <script src="/curry.js"></script>
 
   <script type="text/javascript">
   
   var b;
 
-  sand.require('Compagnon/*','Drawing/*', function (r) {
+  sand.require('Compagnon/*','Drawing/*','core/Array/*', function (r) {
     //console.log(r)
     b = new r.Compagnon.Compagnon({ "data" : [{ "type" : "video", "legend" : "lol", "link" : "https://www.youtube.com/watch?v=z2exxj4COhU" },{ "type" : "image", "legend" : "yeah", "link" : "http://rodrigonzalez01.files.wordpress.com/2012/02/yeah1.jpg" }]});
     document.body.appendChild(b.el);
