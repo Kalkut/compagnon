@@ -10,6 +10,7 @@ sand.define('Compagnon/Compagnon', ['Compagnon/*','DOM/handle','PrototypeExtensi
       this.actions = [/*{ action : "update", type : "drawing"}*/];
       this.cancel = 0;
       this.defaultType = this.input.defaultType || "drawing";
+      //this.topBar.ressourcesHTML;
       
       this.el = toDOM({
         tag : '.compagnon',
@@ -64,20 +65,49 @@ sand.define('Compagnon/Compagnon', ['Compagnon/*','DOM/handle','PrototypeExtensi
       })
 
       this.on('compagnon:sync', function () {
-        
+
       }.bind(this))
 
+      this.on('compagnon:ressource:dropped', function (droppedElement,targetElement) { // could be  designed in a way better way
+          var k = 0;
+          var i = 0;
 
+
+          var testElement = this.topBar.ressourcesHTML[k];
+          var testElement2 = this.topBar.ressourcesHTML[i];
+
+
+          while(droppedElement !== testElement) {
+            k++;
+            testElement = this.topBar.ressourcesHTML[k];
+          }
+          while(targetElement !== testElement2) {
+            i++;
+            testElement2 = this.topBar.ressourcesHTML[i];
+          }
+
+          this.topBar.ressourcesHTML[i] = testElement;
+          this.topBar.ressourcesHTML[k] = testElement2;
+
+          for(var p = 0, n = this.topBar.ressourcesHTML.length; p < n; p++ ) {
+            this.topBar.ressourcesHTML[p].parentNode.removeChild(this.topBar.ressourcesHTML[p]);
+            this.topBar.ressourcesHTML[p].style.left = "0px";
+            this.topBar.ressourcesHTML[p].style.cssFloat = "left";
+          }
+          for(var z = 0, m = this.topBar.ressourcesHTML.length; z < m ; z++ ) {
+            this.topBar.el.children[1].appendChild(this.topBar.ressourcesHTML[z]);
+          }
+      }.bind(this))
 
       for(var k = 0, len = this.workspace.items.length; k < len; k++) {
         this.workspace.items[k].on('Item:snapshotTaken', function (k,preview) {
           this.topBar.ressources[k].el.style.backgroundImage = "url(\"" + preview + "\")";
         }.bind(this).curry(k))
         
-        /*this.topBar.ressources[k].el.addEventListener("mousedown", function (k) {
+        this.topBar.ressources[k].el.addEventListener("mousedown", function (k) {
           this.select(k);
           this.currentIndex = k;
-        }.bind(this).curry(k))*/
+        }.bind(this).curry(k))
       }
 
       if(this.input.data.length) {
@@ -132,12 +162,12 @@ sand.define('Compagnon/Compagnon', ['Compagnon/*','DOM/handle','PrototypeExtensi
       this.topBar.ressources.splice(this.currentIndex,1);
       this.workspace.items.splice(this.currentIndex,1);
 
-      /*for (var i = 0, n = this.topBar.ressources.length; i < n; i++) {
+      for (var i = 0, n = this.topBar.ressources.length; i < n; i++) {
         this.topBar.ressources[i].el.addEventListener("mousedown", function (i) {
           this.currentIndex = i;
           this.select(i)
         }.bind(this).curry(i));
-      }*/
+      }
       
       if(this.currentIndex >= this.topBar.ressources.length) this.currentIndex--;
       if(this.workspace.items) daddy.appendChild(this.workspace.items[this.currentIndex].el);
@@ -153,6 +183,8 @@ sand.define('Compagnon/Compagnon', ['Compagnon/*','DOM/handle','PrototypeExtensi
       var newR = new r.Compagnon.Ressource({type : type, data : data})
       
       this.topBar.ressources.push(newR)
+      if(this.topBar.ressourcesHTML) this.topBar.ressourcesHTML.push(newR.el);
+      else this.topBar.ressourcesHTML = [newR.el];
       this.topBar.el.children[1].appendChild(newR.el);
 
       if(this.workspace.items[this.currentIndex]) {// if no item declared remove nothing
@@ -173,10 +205,14 @@ sand.define('Compagnon/Compagnon', ['Compagnon/*','DOM/handle','PrototypeExtensi
           this.topBar.ressources[this.currentIndex].el.style.backgroundImage = "url(\"" + preview + "\")";
       }.bind(this))
 
-      /*newR.el.addEventListener("mousedown", function () {
+      newR.el.addEventListener("mousedown", function () {
         this.select(newIndice);
         this.currentIndex = newIndice;
-      }.bind(this));*/
+      }.bind(this));
+
+      newR.on('ressource:dropped', function (droppedElement,targetElement) {
+        this.fire('compagnon:ressource:dropped',droppedElement,targetElement);
+      }.bind(this))
 
       if(!cancel) {
         this.cancel = 0

@@ -5,6 +5,15 @@ sand.define('Compagnon/Banner', function (r) {
         tag : '.header',
         children : [
         {
+          tag : ".leftBorder"
+        },
+        {
+          tag : ".curvedBorder"
+        },
+        {
+          tag : ".rightBorder"
+        },
+        {
           tag : '.logo',
         },
         {
