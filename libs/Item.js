@@ -18,12 +18,14 @@ sand.define('Compagnon/Item', function (r) {
         },
         events : {
           keyup : function (e) {
+            if(e.keyCode === 13) e.preventDefault();
             if(this.actions && this.cancel) {
               for(var i = 0; i <= this.cancel; i++ ) {
                 this.actions.pop();
               }
               this.cancel = 0;
             }
+            this.input.legend = this.legend.innerHTML;
             this.fire('item:legendUpdated',this.legend.innerHTML);
           }.bind(this),
           blur : function () {
@@ -31,8 +33,9 @@ sand.define('Compagnon/Item', function (r) {
           }.bind(this),
           keydown : function (e) {
             if (e.keyCode === 13) {
-              document.execCommand('insertHTML', false, '<br><br>');
+              document.execCommand('insertHTML', false, '<br></br>');
               return false;
+
             } 
           }
         },

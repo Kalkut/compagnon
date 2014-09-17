@@ -68,6 +68,9 @@ body {
       height: 32%;
       font-family : "clr";
       color : #FFFFFF;
+      top: -42%;
+position: absolute;
+width: 20%;
       /*background-image: url("select.png");
       background-repeat: no-repeat;
       background-size: contain;*/ }
@@ -81,12 +84,13 @@ body {
         float: left;
         margin-right: 1.5%;
         background-color: #FFFFFF;
-        background-repeat: no-repeat; }
+        background-repeat: no-repeat;
+        position: relative; }
       body .items-block .items .mini-item.drawing {
         background-size: contain; }
       body .items-block .items .mini-item.video, body .items-block .items .mini-item.image {
         background-size: cover;
-        position: relative; }
+         }
   body .actions {
     height: 3.1067961165048542%;
     width: 15%;
@@ -207,7 +211,7 @@ body {
 }
 
 
-/*.undo-redo-clear{
+.undo-redo-clear{
   height : 5%;
   width: 20%;
   position: absolute;
@@ -220,7 +224,9 @@ body {
   width : 33%;
   height : 100%;
   position : relative;
-  background-color : orange;
+  /*background-color : orange;*/
+  background-image : url('/previousGris.png');
+  background-size : contain;
 }
 
 .drawing-redo{
@@ -228,7 +234,9 @@ body {
   width : 33%;
   height : 100%;
   position : relative;
-  background-color : yellow;
+  /*background-color : yellow;*/
+  background-image : url('/nextGris.png');
+  background-size : contain;
 }
 
 .drawing-clear{

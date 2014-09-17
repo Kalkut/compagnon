@@ -16,6 +16,7 @@ sand.define('Compagnon/TopBar',['Compagnon/Ressource','DOM/handle'], function  (
         children : [
         {
           tag : '.select',
+          innerHTML : "SELECT",
         },
         {
           tag : '.items', //CHILDREN ARE '.item'

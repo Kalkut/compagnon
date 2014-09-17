@@ -46,12 +46,14 @@ sand.define('Compagnon/Workspace',['Compagnon/ToolBar','Compagnon/Drawing','Comp
       this.items = this.input.items || [/*new r[this.hashTypes[this.currentType]](input)*/];
       this.itemsHtml = [];
       
-      for(var h = 0, len = this.items.length; h < len; h++) {
-        this.itemsHtml.push(this.items[h].el);
-        this.items[h].on('item:legendUpdated', function (legend) {
-          this.input.legend = legend;
+      /*for(var h = 0, len = this.items.length; h < len; h++) {
+        this.workspace.itemsHtml.push(this.workspace.items[h].el);
+        console.log('ok');
+        this.workspace.items[h].on('item:legendUpdated', function (legend) {
+          this.workspace.input.legend = legend;
+          console.log(legend)
         }.bind(this))
-      }
+      }*/
 
       this.switchPicto = toDOM({
         tag : '.switch',
