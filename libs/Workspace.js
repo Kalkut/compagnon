@@ -81,7 +81,7 @@ sand.define('Compagnon/Workspace',['Compagnon/ToolBar','Compagnon/Drawing','Comp
       if(type){
         if(!data) var data = {};
         if(!index) var index = this.currentIndex;
-        if(!legend) var legend = this.items[index].legend.innerHTML || "";
+        if(!legend) var legend = this.items[index].input.legend || "";
         var oldType = this.items[index].type;
         var daddy = this.items[index].el.parentNode;
         daddy.removeChild(this.items[index].el);

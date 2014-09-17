@@ -28,7 +28,7 @@ sand.define('DOM/devices/Ipad',[
   var Ipad = r.Seed.extend({
         
     '+init' : function(o) {
-      console.log('new handle')
+      //console.log('new handle')
       this.number = number++;
       //console.log("building this.number", this.number);
       this.moved = false;
@@ -343,7 +343,7 @@ sand.define('DOM/devices/Ipad',[
     },
     
     _touchstart : function(e, o) {
-      console.log('touchstart')
+      //console.log('touchstart')
       e.halt = e.halt || function() {
         e.stopPropagation();
         e.preventDefault();

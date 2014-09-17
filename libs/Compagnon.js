@@ -66,7 +66,7 @@ sand.define('Compagnon/Compagnon', ['Compagnon/*','DOM/handle','PrototypeExtensi
 
       this.workspace.on('workspace:updated', function (index,type,data,legend,oldType) {
         this.cancel = 0;
-        this.actions.push({ action : "update", type : type,oldType : oldType, data : data, legend : legend});
+        this.actions.push({ action : "update", type : type,oldType : oldType, data : data, legend : legend, index : index});
         this.workspace.items[index].on('Item:snapshotTaken', function (preview) {
           this.topBar.ressources[index].el.style.backgroundImage = "url(\"" + preview + "\")";
         }.bind(this))
@@ -87,7 +87,7 @@ sand.define('Compagnon/Compagnon', ['Compagnon/*','DOM/handle','PrototypeExtensi
 
       this.on('Compagnon:itemDeleted', function (newindex,data,type) {
         this.workspace.currentIndex = this.currentIndex = newindex;
-        this.actions.push({ action : "delete", data : data, type : type});
+        this.actions.push({ action : "delete", data : data, index : newindex,type : type});
       })
 
       this.on('compagnon:sync', function () {
@@ -123,8 +123,7 @@ sand.define('Compagnon/Compagnon', ['Compagnon/*','DOM/handle','PrototypeExtensi
             this.topBar.ressourcesHTML = withoutDrop.slice(0,i).concat([droppedElement]).concat(withoutDrop.slice(i,withoutDrop.length));
             //this.workspace.items = itemsUpdate.slice(0,i).concat(dropItem).concat(itemsUpdate.slice(i,itemsUpdate.length));
           }
-          console.log(targetElement);
-          console.log(this.topBar.ressourcesHTML)
+
           for(var p = 0, n = this.topBar.ressourcesHTML.length; p < n; p++ ) {
             this.topBar.ressourcesHTML[p].parentNode.removeChild(this.topBar.ressourcesHTML[p]);
             this.topBar.ressourcesHTML[p].style.left = "0px";
@@ -165,10 +164,10 @@ sand.define('Compagnon/Compagnon', ['Compagnon/*','DOM/handle','PrototypeExtensi
     },
 
     undo : function () { //actions à annuler à spécifier
-      if(this.actions && this.cancel < this.actions.length - this.uncancelableActions) {
+      if(this.actions && this.cancel < this.actions.length /*- this.uncancelableActions*/) {
         this.cancel++
         var actionToCancel = this.actions[this.actions.length - this.cancel];
-        if(actionToCancel.action === 'update' ) this.workspace.update(actionToCancel.oldType,actionToCancel.data,actionToCancel.index,actionToCancel.legend,true);
+        if(actionToCancel.action === 'update' ) this.workspace.update(actionToCancel.oldType,actionToCancel.data,actionToCancel.legend,actionToCancel.index,true);
         else if (actionToCancel.action === 'add') this.delete(true);
         else if (actionToCancel.action === 'delete') this.add(actionToCancel.type,actionToCancel.data,true);
         this.fire('compagnon:undo');
@@ -178,7 +177,7 @@ sand.define('Compagnon/Compagnon', ['Compagnon/*','DOM/handle','PrototypeExtensi
     redo : function () {//actions à rétablir à spécifier
       if(this.actions && this.cancel >= 1) {
         var actionToCancel = this.actions[this.actions.length - this.cancel];
-        if(actionToCancel.action === 'update' ) this.workspace.update(actionToCancel.type,actionToCancel.data,actionToCancel.index,actionToCancel.legend,true);
+        if(actionToCancel.action === 'update' ) this.workspace.update(actionToCancel.type,actionToCancel.data,actionToCancel.legend,actionToCancel.index,true);
         else if (actionToCancel.action === 'add') this.add(actionToCancel.type,actionToCancel.data,true);
         else if (actionToCancel.action === 'delete') this.delete(true);
 
@@ -262,7 +261,7 @@ sand.define('Compagnon/Compagnon', ['Compagnon/*','DOM/handle','PrototypeExtensi
       }.bind(this))
 
       if(!cancel) {
-        this.cancel = 0
+        this.cancel = 0;
         this.fire('Compagnon:itemAdded',this.currentIndex,type,data);
       }
       this.workspace.fire('Workspace:newCurrentIndex',this.currentIndex)
@@ -273,7 +272,6 @@ sand.define('Compagnon/Compagnon', ['Compagnon/*','DOM/handle','PrototypeExtensi
     },
 
     select : function (index) {
-      console.log('ok')
       var daddy = this.workspace.items[this.currentIndex].el.parentNode;
       daddy.removeChild(this.workspace.items[this.currentIndex].el);
       //console.log(this.topBar.ressources[this.currentIndex].el.className, "mini-item " + this.topBar.ressources[this.currentIndex].type)

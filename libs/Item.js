@@ -33,9 +33,9 @@ sand.define('Compagnon/Item', function (r) {
           }.bind(this),
           keydown : function (e) {
             if (e.keyCode === 13) {
-              document.execCommand('insertHTML', false, '<br></br>');
+              e.preventDefault();
+              document.execCommand('insertHTML', false, '<br><br>');
               return false;
-
             } 
           }
         },
