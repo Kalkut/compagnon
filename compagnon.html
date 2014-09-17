@@ -82,6 +82,14 @@
     //console.log(r)
     b = new r.Compagnon.Compagnon({ "data" : [{ "type" : "video", "legend" : "lol", "link" : "http://www.youtube.com/watch?v=1W8hsVvyKt4" },{ "type" : "image", "legend" : "yeah", "link" : "http://rodrigonzalez01.files.wordpress.com/2012/02/yeah1.jpg" }]});
     document.body.appendChild(b.el);
+
+    b.on('compagnon:sync', function(d) {
+      console.log(d);
+    });
+
+    b.on('ressource:edit', function(ressource) {
+      console.log(JSON.stringify(ressource));
+    });
   })
   </script>
 </body>

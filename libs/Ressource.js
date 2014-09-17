@@ -1,10 +1,16 @@
-sand.define('Compagnon/Ressource',['DOM/handle','core/Array/*'], function (r) {
-  return Seed.extend({
+sand.define('Compagnon/Ressource', [
+  'DOM/handle',
+  'core/Array/*',
+  'Seed',
+  'DOM/toDOM'
+], function (r) {
+  
+  return r.Seed.extend({
     '+init' : function (input) {
       this.type = input ? (input.type ? input.type : 'drawing') : 'drawing';
       this.preview;
 
-      this.el = toDOM({
+      this.el = r.toDOM({
         tag : '.mini-item.' + this.type,
       })
 
@@ -41,5 +47,6 @@ sand.define('Compagnon/Ressource',['DOM/handle','core/Array/*'], function (r) {
       this.type = type;
       this.fire('ressource:update')
     }
-  })
-})
+  });
+
+});

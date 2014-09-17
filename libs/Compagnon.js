@@ -1,18 +1,30 @@
-sand.define('Compagnon/Compagnon', ['Compagnon/*','DOM/handle','PrototypeExtensions/curry'], function (r) {
-  return Seed.extend({
+sand.define('Compagnon/Compagnon', [
+  'Compagnon/*', //STT non, si ton module est Compagnon/Compagnon, il ne peut pas require Compagnon/* (qui est sensé l'inclure aussi).
+  'DOM/handle',
+  'PrototypeExtensions/curry',
+  'Seed',
+  'DOM/toDOM'
+], function (r) {
+
+  return r.Seed.extend({
     '+init' : function (input) {
       input ? this.input = jQuery.extend({},input) : this.input = { "data" : []} 
       this.actionBar = new r.Compagnon.ActionBar(this.input);
       this.banner = new r.Compagnon.Banner(this.input);
       this.topBar = new r.Compagnon.TopBar(this.input);
+      
       this.workspace =  new r.Compagnon.Workspace(this.input);
+      this.workspace.on('ressource:edit', function(ressource) {
+        this.fire('ressource:edit', ressource.getData());
+      }.bind(this), this);
+
       this.currentIndex = this.input.currentIndex || 0;
       this.actions = [/*{ action : "update", type : "drawing"}*/];
       this.cancel = 0;
       this.defaultType = this.input.defaultType || "drawing";
       //this.topBar.ressourcesHTML;
       
-      this.el = toDOM({
+      this.el = r.toDOM({
         tag : '.compagnon',
         children : [
         this.banner.el,
@@ -28,7 +40,9 @@ sand.define('Compagnon/Compagnon', ['Compagnon/*','DOM/handle','PrototypeExtensi
       }.bind(this))
 
       this.banner.on('banner:sync', function () {
-        this.sync();
+        //this.sync();
+        this.sync = !this.sync;
+        this.fire(this.sync ? 'sync' : 'unsync', this.workspace.items[index || index === 0 ? index : this.currentIndex].getData());
       }.bind(this));
 
       this.actionBar.on('actionBar:undo', function () {
@@ -148,11 +162,10 @@ sand.define('Compagnon/Compagnon', ['Compagnon/*','DOM/handle','PrototypeExtensi
 
         this.cancel--
       }
-      this.fire('compagnon:redo');
+      this.fire('compagnon:redo'); //STT this.fire('redo'), compagnon ne parle pas d'elle même à la troisième personne !
     },
 
     delete : function (cancel) {
-      console.log('delete');
       this.topBar.ressources[this.currentIndex].el.parentNode.removeChild(this.topBar.ressources[this.currentIndex].el);
       var daddy = this.workspace.items[this.currentIndex].el.parentNode;
       var data = this.workspace.items[this.currentIndex].input;
@@ -177,7 +190,7 @@ sand.define('Compagnon/Compagnon', ['Compagnon/*','DOM/handle','PrototypeExtensi
     },
 
     add : function (type,data,cancel) {
-      if(!data) var data = {};
+      if(!data) var data = {}; //STT var data = data || {};
       if(!type) var type = "drawing";
 
       var newR = new r.Compagnon.Ressource({type : type, data : data})
@@ -185,17 +198,16 @@ sand.define('Compagnon/Compagnon', ['Compagnon/*','DOM/handle','PrototypeExtensi
       this.topBar.ressources.push(newR)
       if(this.topBar.ressourcesHTML) this.topBar.ressourcesHTML.push(newR.el);
       else this.topBar.ressourcesHTML = [newR.el];
-      this.topBar.el.children[1].appendChild(newR.el);
+      this.topBar.el.children[1].appendChild(newR.el); //STT non
 
       if(this.workspace.items[this.currentIndex]) {// if no item declared remove nothing
         var daddy = this.workspace.items[this.currentIndex].el.parentNode;
         daddy.removeChild(this.workspace.items[this.currentIndex].el);
       } else {
-        var daddy = this.workspace.el.children[2];
+        var daddy = this.workspace.el.children[2]; //STT non
       }
 
       var newIndice = this.topBar.ressources.length - 1;
-      
       
       this.currentIndex = newIndice;
       this.workspace.items.push(new r.Compagnon[this.workspace.hashTypes[type]](data));
@@ -220,6 +232,12 @@ sand.define('Compagnon/Compagnon', ['Compagnon/*','DOM/handle','PrototypeExtensi
       }
       this.workspace.fire('Workspace:newCurrentIndex',this.currentIndex)
       
+      //ugly this should be factorised
+      this.workspace.items[this.currentIndex].on('edit', function() {
+        this.workspace.fire('ressource:edit', this.workspace.items[this.currentIndex]);
+      }.bind(this), this);
+
+      if (this.workspace.items[this.currentIndex].getData) this.fire('to', this.workspace.items[this.currentIndex].getData());
     },
 
     select : function (index) {
@@ -227,6 +245,10 @@ sand.define('Compagnon/Compagnon', ['Compagnon/*','DOM/handle','PrototypeExtensi
       daddy.removeChild(this.workspace.items[this.currentIndex].el);
       daddy.appendChild(this.workspace.items[index].el);
       this.currentIndex = index;
+
+      this.fire('select', this.workspace.items[index].input);
+
+      this.fire('to', this.workspace.items[index].getData());
     },
 
     swap : function (firstIndex,secondIndex) {

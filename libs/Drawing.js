@@ -1,4 +1,9 @@
-sand.define('Compagnon/Drawing',['Compagnon/Item','drawing/Canvas'], function (r) {
+sand.define('Compagnon/Drawing', [
+  'Compagnon/Item',
+  'drawing/Canvas',
+  'DOM/toDOM'
+], function (r) {
+  
   return r.Item.extend({
     '+init' : function (input) {//color:pic
       this.type = "drawing";
@@ -11,6 +16,10 @@ sand.define('Compagnon/Drawing',['Compagnon/Item','drawing/Canvas'], function (r
         curColor : '#408486',
         paths : (input && input.paths) ? input.paths : []
       });
+
+      this.canvas.on('edit', function() {
+        this.fire('edit');
+      }.bind(this), this);
 
       if(input && input.paths) {
         this.canvas.paths = input.paths;
@@ -38,7 +47,7 @@ sand.define('Compagnon/Drawing',['Compagnon/Item','drawing/Canvas'], function (r
         this.fire('Item:snapshotTaken',this.canvas.bg.toDataURL())
       }.bind(this));
 
-      this.undoRedoClear = toDOM({
+      this.undoRedoClear = r.toDOM({
         tag : '.undo-redo-clear',
         children : [
         {
@@ -89,6 +98,16 @@ sand.define('Compagnon/Drawing',['Compagnon/Item','drawing/Canvas'], function (r
 
     setColor : function (color) {
       this.canvas.curColor = color;
+    },
+
+    getData : function() {
+      return {
+        type : 'drawing',
+        id : this.id,
+        paths : this.canvas.paths,
+        size : [this.canvas.canvas.offsetWidth, this.canvas.canvas.offsetHeight],
+        legend : this.input.legend
+      }
     }
   })
 })

@@ -24,6 +24,7 @@ var serveur =  http.createServer(function (req,res) {
 		//console.log(req.url.split(".")[0]);
 		fs.readFile('libs' + req.url.split(".")[0]  +".js", function (err, data) {
 			if (err) throw err;
+			res.setHeader('Content-Type', 'application/javascript');
 			res.end(data);
 			console.log(req.url.split(".")[0]);
 		})

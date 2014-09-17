@@ -1,8 +1,14 @@
-sand.define('Compagnon/ToolBar',['PrototypeExtensions/curry'], function (r) {
-  return Seed.extend({
+sand.define('Compagnon/ToolBar', [
+  'PrototypeExtensions/curry',
+  'Seed',
+  'DOM/toDOM',
+  'core/Function/curry'
+], function (r) {
+
+  return r.Seed.extend({
     '+init' : function (input) {
       var scope = {};
-      this.el = toDOM({
+      this.el = r.toDOM({
         tag : '.panel',
         children : [
         {
@@ -56,10 +62,6 @@ sand.define('Compagnon/ToolBar',['PrototypeExtensions/curry'], function (r) {
         }
         ]
       },scope)
-
-      document.body.addEventListener('mousedown', function (scope) {
-        scope.input.style.display = "none";
-      }.curry(scope),true)
     },
 
     drawing : function () {

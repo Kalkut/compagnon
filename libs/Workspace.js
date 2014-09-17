@@ -1,5 +1,14 @@
-sand.define('Compagnon/Workspace',['Compagnon/ToolBar','Compagnon/Drawing','Compagnon/Image','Compagnon/Video','Compagnon/Url'], function (r) {
-  return Seed.extend({
+sand.define('Compagnon/Workspace', [
+  'Compagnon/ToolBar',
+  'Compagnon/Drawing',
+  'Compagnon/Image',
+  'Compagnon/Video',
+  'Compagnon/Url',
+  'Seed',
+  'DOM/toDOM'
+], function (r) {
+  
+  return r.Seed.extend({
     '+init' : function (input) {
       this.toolBar = new r.ToolBar();
       
@@ -39,7 +48,7 @@ sand.define('Compagnon/Workspace',['Compagnon/ToolBar','Compagnon/Drawing','Comp
 
       this.input.currentIndex >= 0 ? this.currentIndex = this.input.currentIndex : this.currentIndex = 0;
       
-      if(!this.input.paths) this.input.paths = [];
+      if (!this.input.paths) this.input.paths = [];
 
       this.hashTypes = { drawing : "Drawing", video : "Video", image : "Image", url : "Url" };
 
@@ -53,11 +62,11 @@ sand.define('Compagnon/Workspace',['Compagnon/ToolBar','Compagnon/Drawing','Comp
         }.bind(this))
       }
 
-      this.switchPicto = toDOM({
+      this.switchPicto = r.toDOM({
         tag : '.switch',
       })
 
-      this.el = toDOM({
+      this.el = r.toDOM({
         tag : '.edit',
         children : [
         this.toolBar.el,
@@ -76,7 +85,7 @@ sand.define('Compagnon/Workspace',['Compagnon/ToolBar','Compagnon/Drawing','Comp
     },
 
     update : function (type,data,legend,index,cancel) {
-      if(type){
+      if(type) {
         if(!data) var data = {};
         if(!index) var index = this.currentIndex;
         if(!legend) var legend = this.items[index].legend.innerHTML || "";
@@ -84,6 +93,11 @@ sand.define('Compagnon/Workspace',['Compagnon/ToolBar','Compagnon/Drawing','Comp
         var daddy = this.items[index].el.parentNode;
         daddy.removeChild(this.items[index].el);
         this.items[index] = this.create(r[this.hashTypes[type]],data);
+
+        this.items[index].on('edit', function() {
+          this.fire('ressource:edit', this.items[index]);
+        }.bind(this), this);
+
         daddy.appendChild(this.items[index].el);
         this.items[index].legend.innerHTML = legend;
         this.input.legend = legend;

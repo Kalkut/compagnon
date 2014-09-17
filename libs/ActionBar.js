@@ -1,7 +1,12 @@
-sand.define('Compagnon/ActionBar', function  (r) {
-  return Seed.extend({
-    '+init' : function (input) {
-      this.el = toDOM({
+sand.define('Compagnon/ActionBar', [
+  'Seed',
+  'DOM/toDOM'
+], function (r) {
+
+  return r.Seed.extend({
+    
+    'tpl' : function() {
+      return {
         tag : '.actions',
         children : [
         {
@@ -25,7 +30,7 @@ sand.define('Compagnon/ActionBar', function  (r) {
             mousedown : this.redo.bind(this),
           }
         }]        
-      })
+      }
     },
 
     add : function () {
@@ -39,5 +44,6 @@ sand.define('Compagnon/ActionBar', function  (r) {
     redo : function () {
       this.fire('actionBar:redo')
     },
-  })
-})
+  });
+
+});

@@ -1,10 +1,14 @@
-sand.define('Case',["Geo/*"], function (r) {
+sand.define('Case', [
+	"Geo/*",
+	'Seed',
+	'DOM/toDOM'
+], function (r) {
 	
 	var onimagesload = function (imgs,callback) {
 		var l = imgs.length;
 		var c = 0;
 		for (var i = 0; i < l; i++){
-			if(imgs[i].loaded) c++;
+			if (imgs[i].complete) c++;
 			else imgs[i].onload = function () {
 				c++;
 				if (c === l) callback();
@@ -14,7 +18,7 @@ sand.define('Case',["Geo/*"], function (r) {
 		if (c === l) callback();
 	}
 
-	return Seed.extend({
+	return r.Seed.extend({
 		'+options' : {
 			type : 'img',
 			clicking : false
@@ -36,19 +40,19 @@ sand.define('Case',["Geo/*"], function (r) {
 			this.staticPoint;
 			this.states = [];
 			
-			this.div = toDOM({
+			this.div = r.toDOM({
 				tag : 'div.' + (options.prefix ? (options.prefix + "-") : "") + "case",
 				style : {
 					/*position : "absolute",*/
 					overflow : "hidden",
-					width : options.width,
-					height : options.height,
+					width : options.width + 'px',
+					height : options.height + 'px',
 					outline : "none",
 				}
 			})
 
 			if(this.type === 'txt') {
-				this.txtBloc = toDOM({
+				this.txtBloc = r.toDOM({
 					tag : 'table.' + (options.prefix ? (options.prefix + "-") : "") + "case",
 					children : [
 					{
@@ -198,14 +202,13 @@ sand.define('Case',["Geo/*"], function (r) {
 
 		loadCase : function (firstLoad) {//methode permettant d'initialiser la position de l'image
 			var loading = function () {
-
-				if(this.pos) {
+				if (this.pos) {
 					this.ratio = parseInt(this.img.naturalHeight)/parseInt(this.img.naturalWidth);
 					this.img.style.width = this.pos[2] + 'px';
 					this.img.style.height = this.pos[3] + 'px';
 					this.img.style.left = this.pos[0] + 'px';
 					this.img.style.top = this.pos[1] + 'px';
-				}else {
+				} else {
 					this.img.style.height = this.img.naturalHeight + 'px';
 					this.img.style.width = this.img.naturalWidth + 'px';
 					this.img.style.left = 0 + 'px';
