@@ -4,14 +4,10 @@
   <title>Compagnon</title>
   <link rel="stylesheet" href="/style.css"></link>
 </meta>
-<meta name="viewport" content="width=device-width height=device-height">
+<meta name="viewport" content="width=device-width, user-scalable=no"></meta>
 </head>
 <body>
 
-  <script src="/sandmin.js"></script>
-  <script src="/jquery.js"></script>
-  <script src="/toDOM.js"></script>
-  <script src="/Seed.js"></script>
   <script src="/Banner.js"></script>
   <script src="/ToolBar.js"></script>
   <script src="/TopBar.js"></script>
@@ -24,64 +20,31 @@
   <script src="/Image.js"></script>
   <script src="/Video.js"></script>
   <script src="/Url.js"></script>
-  <script src="/core.min.js"></script>
-  <!--<script src="/DOM.min.js"></script>-->
-  <script src="/SeedWithSand.js"></script>
 
   
   <script src="/Canvas.js"></script>
   <script src="/Case.js"></script>
-
-  <script src="/where.js"></script>
-  <script src="/Rect.js"></script>
-  <script src="/Point.js"></script>
-  <script src="/Seg.js"></script>
-  <script src="/R4.js"></script>
-  <script src="/Ref.js"></script>
-  <script src="/extend.js"></script>
-  <script src="/isArray.js"></script>
-  <script src="/prototypes.js"></script>
-
-  <script src="/DOM/Gesture.js"></script>
-  <script src="/DOM/UA.js"></script>
-  <script src="/DOM/caretAtEnd.js"></script>
-  <script src="/DOM/createClass.js"></script>
-  <script src="/DOM/ctrlaable.js"></script>
-  <script src="/DOM/devices/Chrome.js"></script>
-  <script src="/DOM/devices/Firefox.js"></script>
-  <script src="/DOM/devices/Ipad.js"></script>
-  <script src="/DOM/devices/Opera.js"></script>
-  <script src="/DOM/devices/ie.js"></script>
-  <script src="/DOM/devices/tuio.js"></script>
-  <script src="/DOM/document.js"></script>
-  <script src="/DOM/emphasize.js"></script>
-  <script src="/DOM/fake.js"></script>
-  <script src="/DOM/getImageSize.js"></script>
-  <script src="/DOM/getPos.js"></script>
-  <script src="/DOM/getTextSize.js"></script>
-  <script src="/DOM/handle.js"></script>
-  <script src="/DOM/hexToRgb.js"></script>
-  <script src="/DOM/hsvToRgb.js"></script>
-  <script src="/DOM/lighten.js"></script>
-  <script src="/DOM/onfontsloaded.js"></script>
-  <script src="/DOM/parents.js"></script>
-  <script src="/DOM/rgbToHex.js"></script>
-  <script src="/DOM/rgbToHsv.js"></script>
-  <script src="/DOM/select.js"></script>
-  <script src="/DOM/selection.js"></script>
-  <script src="/DOM/state.js"></script>
-  <script src="/DOM/toDOM.js"></script>
-
-  <script src="/curry.js"></script>
+  
 
   <script type="text/javascript">
   
   var b;
+  document.body.addEventListener("touchmove", function (e){
+    e.preventDefault();
+  })
 
-  sand.require('Compagnon/*','Drawing/*','core/Array/*', function (r) {
+  sand.require('core/Array/*','Compagnon/*','Drawing/*', function (r) {
     //console.log(r)
-    b = new r.Compagnon.Compagnon({ "data" : [{ "type" : "video", "legend" : "lol", "link" : "http://www.youtube.com/watch?v=1W8hsVvyKt4" },{ "type" : "image", "legend" : "yeah", "link" : "http://rodrigonzalez01.files.wordpress.com/2012/02/yeah1.jpg" }]});
+    b = new r.Compagnon.Compagnon({ "data" : [{ "type" : "video", "legend" : "lol", "link" : "http://www.youtube.com/watch?v=1W8hsVvyKt4" },{ "type" : "image", "legend" : "yeah", "link" : "wo.jpg" }]});
     document.body.appendChild(b.el);
+
+    b.on('compagnon:sync', function(d) {
+      console.log(d);
+    });
+
+    b.on('ressource:edit', function(ressource) {
+      console.log(JSON.stringify(ressource));
+    });
   })
   </script>
 </body>

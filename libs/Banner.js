@@ -1,65 +1,39 @@
-sand.define('Compagnon/Banner', function (r) {
-  return Seed.extend({
+sand.define('Compagnon/Banner', [
+  'Seed',
+  'DOM/toDOM'
+], function (r) {
+
+  return r.Seed.extend({
     '+init' : function (input)  {
-      this.el = toDOM({
-        tag : '.header',
-        children : [
-        {
-          tag : ".leftBorder"
-        },
-        {
-          tag : ".curvedBorder"
-        },
-        {
-          tag : ".rightBorder"
-        },
-        {
-          tag : '.logo',
-        },
-        {
-          tag : '.middle',
-          children : [
-          {
-            tag : '.login',
-            children : [
-            {
-              tag :  '.home',
-            },
-            {
-              tag : '.name',
-            }],
-          },
-          {
-            tag : '.select-box',
-            children : [
-            {
-              tag : '.board-name',
-            },
-            {
-              tag : '.picto',
-            }]
-          }]
-        },
-        {
-          tag : '.controls',
-          children : [
-          {
-            tag : '.help',
-          },
-          {
-            tag : '.shutdown',
+      this.el = r.toDOM([
+        '.header', [
+          '.leftBorder',
+          '.curvedBorder',
+          '.rightBorder',
+          '.logo',
+          ['.middle', [
+            ['.login', [
+              '.home',
+              '.name'
+            ]]
+            ['.select-box', [
+              '.board-name',
+              '.picto'
+            ]]
+          ]],
+          ['.controls', [
+            '.help',
+            '.shutdown'
+          ]],
+          { tag : '.sync',
+            events : {
+              mousedown : function () {
+                this.sync();
+              }.bind(this)
+            }
           }
-          ]
-        },
-        {
-          tag : '.sync',
-          events : {
-            mousedown : function () {
-              this.sync();
-            }.bind(this)
-          }
-        }]
-      })
+        ]
+      ]);
     },
 
     board : function () {

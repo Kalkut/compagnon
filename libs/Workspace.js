@@ -1,5 +1,14 @@
-sand.define('Compagnon/Workspace',['Compagnon/ToolBar','Compagnon/Drawing','Compagnon/Image','Compagnon/Video','Compagnon/Url'], function (r) {
-  return Seed.extend({
+sand.define('Compagnon/Workspace', [
+  'Compagnon/ToolBar',
+  'Compagnon/Drawing',
+  'Compagnon/Image',
+  'Compagnon/Video',
+  'Compagnon/Url',
+  'Seed',
+  'DOM/toDOM'
+], function (r) {
+  
+  return r.Seed.extend({
     '+init' : function (input) {
       this.toolBar = new r.ToolBar();
       
@@ -39,57 +48,53 @@ sand.define('Compagnon/Workspace',['Compagnon/ToolBar','Compagnon/Drawing','Comp
 
       this.input.currentIndex >= 0 ? this.currentIndex = this.input.currentIndex : this.currentIndex = 0;
       
-      if(!this.input.paths) this.input.paths = [];
+      if (!this.input.paths) this.input.paths = [];
 
       this.hashTypes = { drawing : "Drawing", video : "Video", image : "Image", url : "Url" };
 
       this.items = this.input.items || [/*new r[this.hashTypes[this.currentType]](input)*/];
-      this.itemsHtml = [];
       
-      /*for(var h = 0, len = this.items.length; h < len; h++) {
-        this.workspace.itemsHtml.push(this.workspace.items[h].el);
-        console.log('ok');
-        this.workspace.items[h].on('item:legendUpdated', function (legend) {
-          this.workspace.input.legend = legend;
-          console.log(legend)
-        }.bind(this))
-      }*/
 
-      this.switchPicto = toDOM({
+      this.switchPicto = r.toDOM({
         tag : '.switch',
       })
 
-      this.el = toDOM({
+      this.scope = {};
+
+      this.el = r.toDOM({
         tag : '.edit',
         children : [
         this.toolBar.el,
         this.switchPicto,
         {
           tag : '.workspace',
-          children : /*[
-            {
-            tag : '.container',
-            children : */this.itemsHtml
-            /*}
-          ]*/
         }]
-      })
+      },this.scope);
 
+      this.verticeContainer = this.scope.workspace;
+      console.log(this.verticeContainer)
     },
 
     update : function (type,data,legend,index,cancel) {
-      if(type){
+      if(type) {
         if(!data) var data = {};
         if(!index) var index = this.currentIndex;
         if(!legend) var legend = this.items[index].input.legend || "";
         var oldType = this.items[index].type;
         var daddy = this.items[index].el.parentNode;
+        var history = this.items[index].actions || [];
+        var cancelIndex = this.items[index].cancel
         daddy.removeChild(this.items[index].el);
         this.items[index] = this.create(r[this.hashTypes[type]],data);
+
+        this.items[index].on('edit', function() {
+          this.fire('ressource:edit', this.items[index]);
+        }.bind(this), this);
+
         daddy.appendChild(this.items[index].el);
         this.items[index].legend.innerHTML = legend;
         this.input.legend = legend;
-        if(!cancel) this.fire('workspace:updated',this.currentIndex,type,jQuery.extend({},data),legend,oldType);
+        if(!cancel) this.fire('workspace:updated',this.currentIndex,type,jQuery.extend({},data),legend,oldType,history,cancelIndex);
       }
     },
 

@@ -1,23 +1,12 @@
-sand.define('drawing/Canvas',['drawing/Buttons'], function (req) {
-  Function.prototype.curry = function () {
-    var self = this;
-    var args = Array.prototype.slice.call(arguments);
-    return function () { return self.apply([],args.concat(Array.prototype.slice.call(arguments)));};
-  }
-
-  Array.prototype.each = function (f) {
-    for (var i = 0, n = this.length; i < n; i++){
-      f(this[i],i);
-    }
-  }
-
-  Array.prototype.last = function () {
-    return this[this.length-1];
-  }
+sand.define('drawing/Canvas', [
+  'drawing/Buttons',
+  'DOM/handle',
+  'Seed'
+], function (req) {
 
   var Buttons = req.Buttons;
 
-  var trace = function (canvas,path){
+  var trace = function (canvas,path) {
     var context = canvas.getContext('2d');
     context.strokeStyle = path.color;
     context.lineWidth = path.size;
@@ -32,9 +21,10 @@ sand.define('drawing/Canvas',['drawing/Buttons'], function (req) {
 
     context.stroke();
     context.closePath();
-  }
 
-  return Seed.extend({
+  };
+
+  return req.Seed.extend({
 
     '+init' : function(obj) {
 
@@ -43,10 +33,9 @@ sand.define('drawing/Canvas',['drawing/Buttons'], function (req) {
      this.canvas.style.border = '1px solid #000000'
      this.context = this.canvas.getContext("2d");
 
-     this.clicking = false;
 
 	        //Tableau des noms de couleur, taille et outils
-	        this.idColor = obj.idColor;
+        this.idColor = obj.idColor;
          this.idSize = obj.idSize;
          this.idTool = obj.idTool;
 
@@ -63,7 +52,7 @@ sand.define('drawing/Canvas',['drawing/Buttons'], function (req) {
         	this.curSize = obj.curSize;
         	this.curColor = obj.curColor;
         	this.curTool = obj.curTool;
-        	this.cancel = this.paths.length;
+        	this.cancel = typeof(obj.cancel) == "number" ?  obj.cancel : this.paths.length;
 
         	this.bg = document.createElement('canvas');
         	this.bg.width = this.canvas.width;
@@ -83,67 +72,68 @@ sand.define('drawing/Canvas',['drawing/Buttons'], function (req) {
           this.el = div;
           this.el.className = "drawing-canvas";
 
-          var draw = this;
-
-          this.canvas.onmousedown = function(e) { 
-            var x = (e.pageX - $(this.canvas).offset().left);
-            var y = (e.pageY - $(this.canvas).offset().top);
-
-            var o = {type : this.curTool, size : this.curSize, color : this.curColor, points : [[x,y]]};
-
-            if (draw.curTool === 'crayon'){
-              o.alpha = 0.4;
-              o.compo = "source-over";
-            }else if (draw.curTool === 'feutre'){
-              o.alpha = 0.4;
-              o.compo = "source-over";
-            }else if (draw.curTool === 'marqueur'){
-              o.alpha = 1;
-              o.compo = "source-over";
-            }else if (draw.curTool === 'gomme') {
-              o.alpha = 1;
-              o.compo = "destination-out";
-            }
-
-            if (this.paths.length > this.cancel) {
-              for(var i = 0, n = this.paths.length - this.cancel; i<n; i++){
-               this.paths.pop();
-             }
-           }
-           this.paths.push(o);
-
-           this.cancel = this.paths.length;
-           draw.clicking = true;
-
-         }.bind(this);
-
-
-         this.canvas.onmouseup = function(e) {
-
-           this.clicking = false;
-           trace(this.bg,this.paths.last())
-           this.fire('canvas:newPath',this.paths.last());
-
-         }.bind(this)
-
-         this.canvas.onmouseleave = function(e) {
-           draw.clicking = false;
-         };
-
-
-         this.canvas.onmousemove = function(e) {
-           if(draw.clicking){
-            var x = (e.pageX - $(this.canvas).offset().left);
-            var y = (e.pageY - $(this.canvas).offset().top);
-
-            this.paths.last().points.push([x,y])
-            this.fg_ctx.clearRect(0, 0, this.fg.width, this.fg.height);
-            if(this.curTool == "gomme") trace(this.bg,this.paths.last());
-            else trace(this.fg,this.paths.last());
-          }
-        }.bind(this);
-
+          req.handle(this.canvas).drag({
+            start : this.start.bind(this),
+            drag : this.drag.bind(this),
+            end : this.end.bind(this)
+          });
       },
+
+      start : function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var x = (e.xy[0] - $(this.canvas).offset().left);
+        var y = (e.xy[1] - $(this.canvas).offset().top);
+        var draw = this;
+
+        var o = {type : this.curTool, size : this.curSize, color : this.curColor, points : [[x,y]]};
+
+        if (draw.curTool === 'crayon'){
+          o.alpha = 0.4;
+          o.compo = "source-over";
+        }else if (draw.curTool === 'feutre'){
+          o.alpha = 0.4;
+          o.compo = "source-over";
+        }else if (draw.curTool === 'marqueur'){
+          o.alpha = 1;
+          o.compo = "source-over";
+        }else if (draw.curTool === 'gomme') {
+          o.alpha = 1;
+          o.compo = "destination-out";
+        }
+
+        if (this.paths.length > this.cancel) {
+          for(var i = 0, n = this.paths.length - this.cancel; i<n; i++){
+           this.paths.pop();
+         }
+       }
+       this.paths.push(o);
+
+       this.cancel = this.paths.length;
+       this.fire('start');
+      },
+
+    drag : function(e) {
+      //e.preventDefault();
+      //e.stopPropagation();
+      var x = (e.xy[0] - $(this.canvas).offset().left);
+      var y = (e.xy[1] - $(this.canvas).offset().top);
+
+      this.paths.last().points.push([x,y])
+      this.fg_ctx.clearRect(0, 0, this.fg.width, this.fg.height);
+      if(this.curTool == "gomme") trace(this.bg,this.paths.last());
+      else trace(this.fg,this.paths.last());
+      //this.fire('edit');
+      this.fire('drag');
+    },
+
+    end : function() {
+     trace(this.bg,this.paths.last())
+     this.fire('canvas:newPath',this.paths.last());
+
+     this.fire('edit');
+     this.fire('end');
+    },
 
     	//Ajoute ou enlève une bordure
     	addBorder : function () { 
@@ -169,7 +159,7 @@ sand.define('drawing/Canvas',['drawing/Buttons'], function (req) {
        this.bg_ctx.clearRect(0, 0, this.bg.width, this.bg.height);
        this.fg_ctx.clearRect(0, 0, this.fg.width, this.fg.height);
        for (var i = 0; i < this.cancel; i++){
-        console.log(this.paths[i])
+        //console.log(this.paths[i])
         if(this.paths[i] === "clear") {
           this.bg_ctx.clearRect(0, 0, this.bg.width, this.bg.height);
           this.fg_ctx.clearRect(0, 0, this.fg.width, this.fg.height); 
@@ -186,8 +176,8 @@ sand.define('drawing/Canvas',['drawing/Buttons'], function (req) {
         }else trace(this.bg,this.paths[this.cancel]);
       this.cancel++;
     };
-    console.log(this.paths);
-    console.log(this.cancel)
+    //console.log(this.paths);
+    //console.log(this.cancel)
   },
 
   clear : function () {
@@ -195,7 +185,7 @@ sand.define('drawing/Canvas',['drawing/Buttons'], function (req) {
     this.fg_ctx.clearRect(0, 0, this.fg.width, this.fg.height);
     this.paths.push("clear");
     this.cancel = this.paths.length;
-    console.log(this.paths);
+    //console.log(this.paths);
   },
 
   setToolAt : function(tool){
@@ -246,8 +236,13 @@ setResponsive : function () {
   this.fg.style.width = "100%";
   this.bg.style.top = "0px";
   this.bg.style.width = "100%";
-}
+},
 
+cRedraw : function () {
+  this.bg_ctx.clearRect(0, 0, this.bg.width, this.bg.height);
+  this.fg_ctx.clearRect(0, 0, this.fg.width, this.fg.height);
+  this.redraw();
+}
 
 });
 });

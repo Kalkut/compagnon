@@ -1,17 +1,17 @@
-sand.define('Compagnon/TopBar',['Compagnon/Ressource','DOM/handle'], function  (r) {
-  Function.prototype.curry = function () {
-    var self = this;
-    var args = Array.prototype.slice.call(arguments);
-    //console.log(args);
-    return function () { return self.apply([],args.concat(Array.prototype.slice.call(arguments)));};
-  }
+sand.define('Compagnon/TopBar', [
+  'Compagnon/Ressource',
+  'DOM/handle',
+  'Seed',
+  'DOM/toDOM'
+], function  (r) {
+ 
+ return r.Seed.extend({
 
-  return Seed.extend({
     '+init' : function (input) {
       this.ressources = [];
       this.currentIndex = input ? (input.currentIndex ? input.currentIndex : 0 ) :  0;
       this.scope = {}
-      this.el = toDOM({
+      this.el = r.toDOM({
         tag : '.items-block',
         children : [
         {
@@ -23,7 +23,10 @@ sand.define('Compagnon/TopBar',['Compagnon/Ressource','DOM/handle'], function  (
         }]
       },this.scope)
 
+      this.items = this.scope.items;
+
     },
 
-  })
-})
+  });
+
+});

@@ -1,10 +1,15 @@
-sand.define('Case',["Geo/*"], function (r) {
+sand.define('Case', [
+	"Geo/*",
+	'Seed',
+	'DOM/toDOM',
+	'DOM/handle'
+], function (r) {
 	
 	var onimagesload = function (imgs,callback) {
 		var l = imgs.length;
 		var c = 0;
 		for (var i = 0; i < l; i++){
-			if(imgs[i].loaded) c++;
+			if (imgs[i].complete) c++;
 			else imgs[i].onload = function () {
 				c++;
 				if (c === l) callback();
@@ -14,7 +19,7 @@ sand.define('Case',["Geo/*"], function (r) {
 		if (c === l) callback();
 	}
 
-	return Seed.extend({
+	return r.Seed.extend({
 		'+options' : {
 			type : 'img',
 			clicking : false
@@ -35,20 +40,22 @@ sand.define('Case',["Geo/*"], function (r) {
 			this.divRect;
 			this.staticPoint;
 			this.states = [];
+			this.cancel = 0;
+
 			
-			this.div = toDOM({
+			this.div = r.toDOM({
 				tag : 'div.' + (options.prefix ? (options.prefix + "-") : "") + "case",
 				style : {
 					/*position : "absolute",*/
 					overflow : "hidden",
-					width : options.width,
-					height : options.height,
+					width : options.width + 'px',
+					height : options.height + 'px',
 					outline : "none",
 				}
 			})
 
 			if(this.type === 'txt') {
-				this.txtBloc = toDOM({
+				this.txtBloc = r.toDOM({
 					tag : 'table.' + (options.prefix ? (options.prefix + "-") : "") + "case",
 					children : [
 					{
@@ -96,32 +103,47 @@ sand.define('Case',["Geo/*"], function (r) {
 				this.posClick = [this.img.width/2,this.img.height/2];
 				this.z = 0;
 
-				this.div.onmousedown = function (e) {
+				//this.div.onmousedown = function (e) {
+					this.start = function (e) {
 					e.preventDefault()
 					this.clicking = true;
 				}.bind(this)
 				
 				addEventListener("mouseup", function (e) {
 					this.clicking = false;
-					this.states.push({lastAction : 'move', rect : this.imgRect, left : this.img.style.left, top : this.img.style.top, width : this.img.style.width, height : this.img.style.height});	
 				}.bind(this))
 
-
-
-
-				this.div.addEventListener('mousewheel', function (e) {
-					if(e.shiftKey){
+				this.zoomEvent = function (e) {
+					//if(e.shiftKey || e.scale){
 						e.preventDefault();
-						
 						var delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));// 1 : mousewheelup, 2 : mousewheeldown
-						var factor = delta > 0 ? 1.05 : 0.95;
-						this.potentialRect = this.imgRect.move({staticPoint : this.staticPoint, scale : factor});// Merci Geo
-						this.imgCenter = [parseInt(this.div.style.width)/2,parseInt(this.div.style.height)/2];
-						this.staticPoint = new r.Geo.Point([e.clientX - this.div.offsetLeft,e.clientY - this.div.offsetTop]); //origine du referentiel du zoom = curseur
-						this.staticPoint = this.staticPoint.inRef(this.imgRect.ref);//on dilate l'image en conservant statique la position du curseur -> on passe au référentiel de l'image
+						var factor = (e.scale > 1 || delta > 0) ? 1.01 : 0.99;
 						
+						
+						
+						this.potentialRect = this.imgRect.move({staticPoint : this.staticPoint, scale : factor});// Merci Geo
+						
+						//console.log(this.potentialRect.segX.length() >= this.divRect.segX.length());
+						//if(e.touches.length > 2) alert(e.touches.length);
+						if(e.touches && e.touches.length > 1) {
+							var tCenter = [0.5*(e.touches[0].clientX + e.touches[1].clientX),0.5*(e.touches[0].clientY+e.touches[1].clientY)]
+						}else {
+							var tCenter = [null,null];
+						}
+
+						this.imgCenter = [parseInt(this.div.style.width)/2,parseInt(this.div.style.height)/2];
+						
+						this.staticPoint = new r.Geo.Point([( e.clientX /*|| e.center[0] */|| tCenter[0] || e.xy[0] ) - $(this.div).offset().left,( e.clientY /*|| e.center[1]*/ || tCenter[1] || e.xy[1]) -  $(this.div).offset().top]); //origine du referentiel du zoom = curseur
+
+						//console.log([( e.clientX /*|| e.center[0] */|| tCenter[0] || e.xy[0] ) - $(this.div).offset().left,( e.clientY /*|| e.center[1]*/ || tCenter[1] || e.xy[1]) -  $(this.div).offset().top]);
+						//this.staticPoint = this.staticPoint.inRef(this.imgRect.ref);//on dilate l'image en conservant statique la position du curseur -> on passe au référentiel de l'image
+						
+						
+						
+
 						if( (!this.fit && (( this.potentialRect.segX.length() >= this.divRect.segX.length() ) && ( this.potentialRect.segY.length() >= this.divRect.segY.length() ) ) ) ) {
 							this.zoom(factor);
+							
 							this.fire('case:imageMovedPx',this.img.style.left,this.img.style.top,this.img.style.width,this.img.style.height);
 							this.fire('case:imageMovedInt',parseInt(this.img.style.left),parseInt(this.img.style.top),parseInt(this.img.style.width),parseInt(this.img.style.height));
 						}else if (this.fit) {
@@ -129,24 +151,28 @@ sand.define('Case',["Geo/*"], function (r) {
 							if(!(Math.ceil(this.potentialRect.segX.c2) >= this.divRect.segX.c2 && Math.floor(this.potentialRect.segX.c1) <= this.divRect.segX.c1 && Math.floor(this.potentialRect.segY.c1) <= this.divRect.segY.c1 && Math.ceil(this.potentialRect.segY.c2) >= this.divRect.segY.c2 ) ) {
 							this.imgRect.setCenter(this.divRect.getCenter())
 							this.staticPoint = this.imgCenter
-							this.zoom(factor);
+							this.zoom(factor,2);
+							
 							this.fire('case:imageMovedPx',this.img.style.left,this.img.style.top,this.img.style.width,this.img.style.height);
 							this.fire('case:imageMovedInt',parseInt(this.img.style.left),parseInt(this.img.style.top),parseInt(this.img.style.width),parseInt(this.img.style.height));
 							}else {
 								this.zoom(factor);
+								
 							}
 
 						}
-					}
-				}.bind(this))
+					//}
+				}
 
-				this.div.onmousemove = function (e) {
-					
+				this.div.addEventListener('mousewheel', this.zoomEvent.bind(this))
+
+				//this.div.onmousemove = function (e) {
+					this.drag = function(e) {
 					if(this.clicking && !this.frozen) {
-						this.staticPoint = new r.Geo.Point([e.clientX - this.div.offsetLeft, e.clientY - this.div.offsetTop].add([document.body.scrollLeft, document.body.scrollTop]));
+						this.staticPoint = new r.Geo.Point([e.xy[0] - this.div.offsetLeft, e.xy[1] - this.div.offsetTop].add([document.body.scrollLeft, document.body.scrollTop]));
 						this.staticPoint = this.staticPoint.inRef(this.imgRect.ref);
-						var deltaX = e.clientX - this.img.width/2 - this.posClick[0];
-						var deltaY = e.clientY- this.img.height/2 - this.posClick[1];
+						var deltaX = e.xy[0] - this.img.width/2 - this.posClick[0];
+						var deltaY = e.xy[1]- this.img.height/2 - this.posClick[1];
 						var delta = [deltaX,deltaY];
 						this.potentialRect = this.imgRect.move({vector : delta});
 						
@@ -161,16 +187,33 @@ sand.define('Case',["Geo/*"], function (r) {
 						this.fire('case:imageMovedPx',this.img.style.left,this.img.style.top,this.img.style.width,this.img.style.height);
 						this.fire('case:imageMovedInt',parseInt(this.img.style.left),parseInt(this.img.style.top),parseInt(this.img.style.width),parseInt(this.img.style.height));
 					}
-					this.posClick[0] = e.clientX - this.img.width/2;
-					this.posClick[1] = e.clientY- this.img.height/2;
+					this.posClick[0] = e.xy[0] - this.img.width/2;
+					this.posClick[1] = e.xy[1]- this.img.height/2;
+
 				}.bind(this)
 
 				addEventListener("mousemove", this.div.onmousemove )
 
 				this.loadCase(true);
 
-				this.states.push({lastAction : 'init', rect : this.imgRect, left : this.img.style.left, top : this.img.style.top, width : this.img.style.width, height : this.img.style.height});	
-				
+				//this.states.push({lastAction : 'init', rect : this.imgRect, left : this.img.style.left, top : this.img.style.top, width : this.img.style.width, height : this.img.style.height});	
+				this.sState;
+				this.eState;
+
+				r.handle(this.img).drag({
+            start : function(e) {
+            	this.start(e);
+            	this.states.push({ type : "caseAction", sState : {rect : jQuery.extend({},this.imgRect), left : this.img.style.left, top : this.img.style.top, width : this.img.style.width, height : this.img.style.height}});
+            }.bind(this),
+            drag : function (e) {
+            	if(e.touches.length < 2) this.drag(e);
+            	else if(e.shiftKey || e.scale) this.zoomEvent(e);
+            	}.bind(this),
+            	end : function() {
+            		this.states[this.states.length - 1].eState = {rect : jQuery.extend({},this.imgRect), left : this.img.style.left, top : this.img.style.top, width : this.img.style.width, height : this.img.style.height}
+            		this.fire('caseAction',this.states.last());
+            	}.bind(this)
+          });
 			}	
 		},
 
@@ -198,14 +241,13 @@ sand.define('Case',["Geo/*"], function (r) {
 
 		loadCase : function (firstLoad) {//methode permettant d'initialiser la position de l'image
 			var loading = function () {
-
-				if(this.pos) {
+				if (this.pos) {
 					this.ratio = parseInt(this.img.naturalHeight)/parseInt(this.img.naturalWidth);
 					this.img.style.width = this.pos[2] + 'px';
 					this.img.style.height = this.pos[3] + 'px';
 					this.img.style.left = this.pos[0] + 'px';
 					this.img.style.top = this.pos[1] + 'px';
-				}else {
+				} else {
 					this.img.style.height = this.img.naturalHeight + 'px';
 					this.img.style.width = this.img.naturalWidth + 'px';
 					this.img.style.left = 0 + 'px';
@@ -258,6 +300,36 @@ sand.define('Case',["Geo/*"], function (r) {
 
 		setColor : function(color) {
 			this.txtBloc.children[0].children[0].children[0].style.color = color;
+		},
+
+		undo : function (state) {
+			if(this.states[this.states.length - this.cancel - 1]){
+				this.cancel++;
+				this.imgRect = jQuery.extend({},this.states[this.states.length - this.cancel].sState.rect)
+				this.img.style.left = this.states[this.states.length - this.cancel].sState.left;
+				this.img.style.top = this.states[this.states.length -  this.cancel].sState.top;
+				this.img.style.width = this.states[this.states.length - this.cancel].sState.width;
+				this.img.style.height = this.states[this.states.length  - this.cancel].sState.height;
+			}
+		},
+
+		redo : function (state) {
+			if(this.states[this.states.length - this.cancel]){
+				this.cancel--;
+				this.imgRect = jQuery.extend({},this.states[this.states.length - 1 - this.cancel].eState.rect)
+				this.img.style.left = this.states[this.states.length - 1 - this.cancel].eState.left;
+				this.img.style.top = this.states[this.states.length - 1 - this.cancel].eState.top;
+				this.img.style.width = this.states[this.states.length - 1 - this.cancel].eState.width;
+				this.img.style.height = this.states[this.states.length - 1 - this.cancel].eState.height;
+			}
+		},
+
+		setState : function (state) {
+				this.imgRect = jQuery.extend({},state.rect)
+				this.img.style.left = state.left;
+				this.img.style.top = state.top;
+				this.img.style.width = state.width;
+				this.img.style.height = state.height;
 		}
 	})
 })

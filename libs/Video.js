@@ -3,13 +3,13 @@ sand.define('Compagnon/Video',['Compagnon/Item'], function (r) {
     '+init' : function (input) {
       this.type = "video";
       this.el.className += " video";
-      this.width = window.innerWidth*0.48; 
-      this.height = window.innerHeight*0.366;
+      this.width = window.innerWidth*0.48*1.5; 
+      this.height = window.innerHeight*0.366*1.5;
       this.link = input.link || '';
 
       this.patterns = {
         vimeo : [ /(?:http?s?:\/\/)?(?:www\.)?(?:vimeo\.com)\/?(.+)/g , "//player.vimeo.com/video/", "/vimeo-logo.jpg"],
-        youtube :[ /(?:http?s?:\/\/)?(?:www\.)?(?:youtube\.com|youtu\.be)\/(?:watch\?v=)?(.+)/g , "//www.youtube.com/embed/", "https://i.ytimg.com/vi_webp//default.webp",28]//28 is the index where you insert the id of your media 
+        youtube :[ /(?:http?s?:\/\/)?(?:www\.)?(?:youtube\.com|youtu\.be)\/(?:watch\?v=)?(.+)/g , "//www.youtube.com/embed/", "http://img.youtube.com/vi//default.jpg"/*"https://i.ytimg.com/vi_webp//default.webp"*/,26]//28 is the index where you insert the id of your media 
       }
 
       var media = this.mediaConvert(this.link)
@@ -30,5 +30,16 @@ sand.define('Compagnon/Video',['Compagnon/Item'], function (r) {
       }
       return false;
     },
+
+    getData : function() {
+      return {
+        id : this.id,
+        type : 'image',
+        src : this.src,
+        legend : this.input.legend,
+        link : this.link
+      }
+    }
+
   })
 })

@@ -1,7 +1,8 @@
+//= require modules/sand.min
+//= require_tree modules
 var http = require('http'), fs = require('fs');
 
 var serveur =  http.createServer(function (req,res) {
-	
 	if (req.url === '/') {
 		res.writeHead(200);
 		res.end('Hello');
@@ -10,6 +11,25 @@ var serveur =  http.createServer(function (req,res) {
 		res.writeHead(200);
 		fs.readFile("." + req.url.split(".")[0] + ".html", function (err, data) {
 			if (err) throw err;
+			data = data.toString();
+			data = data.split('<body>');
+			var scripts = "";
+
+			var snockets =  new (require('snockets'));
+			console.log(snockets.scan);
+			snockets.scan('server.js',{async: true },function (e,graph){
+				console.log(e);
+				console.log(graph.getChain('server.js'));
+				var files = graph.getChain('server.js');
+				for(var i = 0, n = files.length; i < n ; i++){
+					scripts += '<script src="'+ files[i] + '"></script>\n';
+				}
+				res.end(data[0] + '<body>' + scripts + data[1]);
+			})
+		})
+	}else if (req.url.split("/")[1] === "modules") {
+		fs.readFile(req.url.split("/")[1] + "/" + req.url.split("/")[2], function (err, data) {
+			if (err) throw err;
 			res.end(data);
 		})
 	} else if (req.url.split(".")[1] === 'min' && req.url.split(".")[2] === 'js') {
@@ -17,15 +37,14 @@ var serveur =  http.createServer(function (req,res) {
 		fs.readFile('libs' + req.url.split(".")[0] + "." + req.url.split(".")[1] +".js", function (err, data) {
 			if (err) throw err;
 			res.end(data);
-			console.log(req.url.split(".")[0]);
 		})
 	}
 	else if (req.url.split(".")[1] === 'js') {
 		//console.log(req.url.split(".")[0]);
 		fs.readFile('libs' + req.url.split(".")[0]  +".js", function (err, data) {
 			if (err) throw err;
+			res.setHeader('Content-Type', 'application/javascript');
 			res.end(data);
-			console.log(req.url.split(".")[0]);
 		})
 	}
 	else if (req.url.split(".")[1] === 'css') {
@@ -33,7 +52,6 @@ var serveur =  http.createServer(function (req,res) {
 		fs.readFile('style' + req.url.split(".")[0]  +".css", function (err, data) {
 			if (err) throw err;
 			res.end(data);
-			console.log(req.url.split(".")[0]);
 		})
 	}
 	else if (req.url.split(".")[1] === 'woff') {
