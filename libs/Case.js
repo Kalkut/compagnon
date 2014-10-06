@@ -41,6 +41,20 @@ sand.define('Case', [
 			this.staticPoint;
 			this.states = [];
 			this.cancel = 0;
+			
+			this.debugScope = {}
+			this.debugBox = r.toDOM({
+				tag : ".debugBox",
+				style : {
+					backgroundColor : "#000000",
+					color : "#FFFFFF",
+					zIndex : 7,
+					position : "absolute"
+				},
+				innerHTML : "debug"
+			},this.debugScope)
+
+			this.debugScope = this.debugScope.debugBox;
 
 			
 			this.div = r.toDOM({
@@ -53,6 +67,8 @@ sand.define('Case', [
 					outline : "none",
 				}
 			})
+
+			this.div.appendChild(this.debugScope)
 
 			if(this.type === 'txt') {
 				this.txtBloc = r.toDOM({
@@ -117,9 +133,10 @@ sand.define('Case', [
 					//if(e.shiftKey || e.scale){
 						e.preventDefault();
 						var delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));// 1 : mousewheelup, 2 : mousewheeldown
-						var factor = (e.scale > 1 || delta > 0) ? 1.01 : 0.99;
-						
-						
+						//var factor = (e.scale > 1 || delta > 0) ? 1.01 : 0.99;
+						var factor = ((this.deltaScale || e.scale) >= e.scale || delta > 0) ? 1.01 : 0.99;
+						this.deltaScale = e.scale || null;
+						this.debugFactor = factor;
 						
 						this.potentialRect = this.imgRect.move({staticPoint : this.staticPoint, scale : factor});// Merci Geo
 						
@@ -171,9 +188,10 @@ sand.define('Case', [
 					if(this.clicking && !this.frozen) {
 						this.staticPoint = new r.Geo.Point([e.xy[0] - this.div.offsetLeft, e.xy[1] - this.div.offsetTop].add([document.body.scrollLeft, document.body.scrollTop]));
 						this.staticPoint = this.staticPoint.inRef(this.imgRect.ref);
-						var deltaX = e.xy[0] - this.img.width/2 - this.posClick[0];
-						var deltaY = e.xy[1]- this.img.height/2 - this.posClick[1];
+						var deltaX = e.xy[0] /*- this.img.width/2*/ - this.posClick[0];
+						var deltaY = e.xy[1] /*- this.img.height/2 */- this.posClick[1];
 						var delta = [deltaX,deltaY];
+						this.debugDelta = delta;
 						this.potentialRect = this.imgRect.move({vector : delta});
 						
 						if ( (Math.ceil(this.potentialRect.segX.c2) >= this.divRect.segX.c2 && Math.floor(this.potentialRect.segX.c1) <= this.divRect.segX.c1 && Math.floor(this.potentialRect.segY.c1) <= this.divRect.segY.c1 && Math.ceil(this.potentialRect.segY.c2) >= this.divRect.segY.c2 ) ) {
@@ -187,8 +205,8 @@ sand.define('Case', [
 						this.fire('case:imageMovedPx',this.img.style.left,this.img.style.top,this.img.style.width,this.img.style.height);
 						this.fire('case:imageMovedInt',parseInt(this.img.style.left),parseInt(this.img.style.top),parseInt(this.img.style.width),parseInt(this.img.style.height));
 					}
-					this.posClick[0] = e.xy[0] - this.img.width/2;
-					this.posClick[1] = e.xy[1]- this.img.height/2;
+					this.posClick[0] = e.xy[0] // - this.img.width/2;
+					this.posClick[1] = e.xy[1] //- this.img.height/2;
 
 				}.bind(this)
 
@@ -200,14 +218,19 @@ sand.define('Case', [
 				this.sState;
 				this.eState;
 
-				r.handle(this.img).drag({
+				r.handle(this.div).drag({
             start : function(e) {
             	this.start(e);
+            	this.posClick[0] = e.xy[0] // - this.img.width/2;
+							this.posClick[1] = e.xy[1]
             	this.states.push({ type : "caseAction", sState : {rect : jQuery.extend({},this.imgRect), left : this.img.style.left, top : this.img.style.top, width : this.img.style.width, height : this.img.style.height}});
             }.bind(this),
             drag : function (e) {
+            	this.debugScope.innerHTML = this.debugDelta;
             	if(e.touches.length < 2) this.drag(e);
-            	else if(e.shiftKey || e.scale) this.zoomEvent(e);
+            	else if(e.shiftKey || e.scale) {
+            		this.zoomEvent(e);
+            	}
             	}.bind(this),
             	end : function() {
             		this.states[this.states.length - 1].eState = {rect : jQuery.extend({},this.imgRect), left : this.img.style.left, top : this.img.style.top, width : this.img.style.width, height : this.img.style.height}
