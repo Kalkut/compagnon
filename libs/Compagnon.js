@@ -5,10 +5,22 @@ sand.define('Compagnon/Compagnon', [
   'Seed',
   'DOM/toDOM'
 ], function (r) {
+  
 
   var toDOM = r.toDOM;
   return r.Seed.extend({
     '+init' : function (input) {
+      document.body.appendChild(toDOM({
+        tag : ".debug",
+        style : {
+          backgroundColor : "#000000",
+          color : "#FFFFFF",
+          zIndex : 7,
+          position : "absolute"
+        },
+        innerHTML : "debug"
+      }));
+
       input ? this.input = jQuery.extend({},input) : this.input = { "data" : []} 
       this.actionBar = new r.Compagnon.ActionBar(this.input);
       this.banner = new r.Compagnon.Banner(this.input);
@@ -278,7 +290,7 @@ sand.define('Compagnon/Compagnon', [
       }.bind(this))
         
       this.workspace.items[this.currentIndex].on('item:legendUpdated', function (legend) {
-        this.workspace.items[this.currentIndex].input.legend = legend;
+        //this.workspace.items[this.currentIndex].input.legend = legend;
       }.bind(this))
 
       this.workspace.items[this.currentIndex].on('action', function (action) {

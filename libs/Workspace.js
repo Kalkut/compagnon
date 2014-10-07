@@ -72,7 +72,6 @@ sand.define('Compagnon/Workspace', [
       },this.scope);
 
       this.verticeContainer = this.scope.workspace;
-      console.log(this.verticeContainer)
     },
 
     update : function (type,data,legend,index,cancel) {

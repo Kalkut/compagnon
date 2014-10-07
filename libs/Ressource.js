@@ -18,6 +18,7 @@ sand.define('Compagnon/Ressource', [
 
       r.handle(this.el).drag({
               start : function(e) {
+                e.preventDefault();
                 this._sx = e.xy[0];
                 this._sy = e.xy[1];
                 this._sl = parseInt(this.el.style.left) || 0;

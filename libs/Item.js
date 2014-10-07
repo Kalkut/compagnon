@@ -12,8 +12,9 @@ sand.define('Compagnon/Item', [
       })
       this.actions = input.actions || [];
       this.cancel = input.cancel || 0;
+      this.lettersCancelThreshold = input.lettersCancelThreshold || 4;
 
-      console.log(this.actions,this.cancel);
+      //console.log(this.actions,this.cancel);
 
       input ? this.input = jQuery.extend({},input) : this.input = {};
       this.type = input ? (input.type ? input.type : 'item') : 'item';
@@ -34,14 +35,7 @@ sand.define('Compagnon/Item', [
               }
               this.cancel = 0;
             }
-/*<<<<<<< HEAD
-            this.input.legend = this.legend.innerHTML;
-=======*/
-
-            this.input.legend = this.legend.innerHTML;
             this.fire('edit');
-
-//>>>>>>> bcf725122110fe7c298a1eef73b3dffe687f7d46
             this.fire('item:legendUpdated',this.legend.innerHTML);
           }.bind(this),
           focus : function (e) {
@@ -64,6 +58,11 @@ sand.define('Compagnon/Item', [
         },
         innerHTML : this.input.legend || ""
       })
+      
+      document.body.addEventListener("touchstart",function (e) {
+        e.target === this.legend ? this.legend.focus() : this.legend.blur();
+      }.bind(this),true)
+
     },
 
     swap : function (type) {// Va être rendu obsolète par workspace:swap

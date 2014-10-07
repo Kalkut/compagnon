@@ -11,21 +11,23 @@ var serveur =  http.createServer(function (req,res) {
 		res.writeHead(200);
 		fs.readFile("." + req.url.split(".")[0] + ".html", function (err, data) {
 			if (err) throw err;
-			data = data.toString();
-			data = data.split('<body>');
-			var scripts = "";
+			if(req.url.split(".")[0] === "compagnon"){	
+				data = data.toString();
+				data = data.split('<body>');
+				var scripts = "";
 
-			var snockets =  new (require('snockets'));
-			console.log(snockets.scan);
-			snockets.scan('server.js',{async: true },function (e,graph){
-				console.log(e);
-				console.log(graph.getChain('server.js'));
-				var files = graph.getChain('server.js');
-				for(var i = 0, n = files.length; i < n ; i++){
-					scripts += '<script src="'+ files[i] + '"></script>\n';
-				}
-				res.end(data[0] + '<body>' + scripts + data[1]);
-			})
+				var snockets =  new (require('snockets'));
+				console.log(snockets.scan);
+				snockets.scan('server.js',{async: true },function (e,graph){
+					console.log(e);
+					console.log(graph.getChain('server.js'));
+					var files = graph.getChain('server.js');
+					for(var i = 0, n = files.length; i < n ; i++){
+						scripts += '<script src="'+ files[i] + '"></script>\n';
+					}
+					res.end(data[0] + '<body>' + scripts + data[1]);
+				})
+			} else res.end(data);
 		})
 	}else if (req.url.split("/")[1] === "modules") {
 		fs.readFile(req.url.split("/")[1] + "/" + req.url.split("/")[2], function (err, data) {

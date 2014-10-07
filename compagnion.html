@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+<head profile="http://www.w3.org/2005/10/profile">
+<!--<link rel="icon" 
+  type="image/png" 
+  href="/assets/favicon.png" />-->
+  <body>
+    <script src="/modules/jquery.js"></script>
+    <input type="file" accept="image/*" capture="camera" id="test" style="width:100%;height:100%" />
+    
+        
+    <script>
+      (function() {
+        /**
+ * Detecting vertical squash in loaded image.
+ * Fixes a bug which squash image vertically while drawing into canvas for some images.
+ * This is a bug in iOS6 devices. This function from https://github.com/stomita/ios-imagefile-megapixel
+ * 
+ */
+function detectVerticalSquash(img) {
+    var iw = img.naturalWidth, ih = img.naturalHeight;
+    var canvas = document.createElement('canvas');
+    canvas.width = 1;
+    canvas.height = ih;
+    var ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0);
+    var data = ctx.getImageData(0, 0, 1, ih).data;
+    // search image edge pixel position in case it is squashed vertically.
+    var sy = 0;
+    var ey = ih;
+    var py = ih;
+    while (py > sy) {
+        var alpha = data[(py - 1) * 4 + 3];
+        if (alpha === 0) {
+            ey = py;
+        } else {
+            sy = py;
+        }
+        py = (ey + sy) >> 1;
+    }
+    var ratio = (py / ih);
+    return (ratio===0)?1:ratio;
+}
+
+/**
+ * A replacement for context.drawImage
+ * (args are for source and destination).
+ */
+function drawImageIOSFix(ctx, img, sx, sy, sw, sh, dx, dy, dw, dh) {
+    var vertSquashRatio = detectVerticalSquash(img);
+ // Works only if whole image is displayed:
+ // ctx.drawImage(img, sx, sy, sw, sh, dx, dy, dw, dh / vertSquashRatio);
+ // The following works correct also when only a part of the image is displayed:
+  var div = document.createElement('div');
+  var values = [sx * vertSquashRatio, sy * vertSquashRatio, sw * vertSquashRatio, sh * vertSquashRatio, dx, dy, dw, dh];
+                  div.innerHTML = 'squash:' + vertSquashRatio + ',[]:' + JSON.stringify(values) + ',' + img.src;
+                  document.body.appendChild(div);
+    ctx.drawImage(img, sx * vertSquashRatio, sy * vertSquashRatio, 
+                       sw * vertSquashRatio, sh * vertSquashRatio, dx, dy, dw, dh);
+}
+        
+        $('#test')[0].onchange = function(event) {
+          // Get a reference to the taken picture or chosen file
+            var files = event.target.files,
+                file;
+            var cb = function(src) {
+              
+              var image = new Image();
+                  image.src = src;
+                  
+              var max = 600;
+                  
+                image.onload = function() {
+                  var realSize = [image.width, image.height];
+
+                  var index;
+                  if (realSize[0] > realSize[1]) {
+                    index = 0;
+                  }
+                  else {
+                    index = 1;
+                  }
+                  
+                  var ratio = 1; // no resize
+                  if (realSize[index] > max) {
+                    ratio = max / realSize[index];
+                  }
+                  var size = [ratio * realSize[0], ratio * realSize[1]];
+                  var canvas = document.createElement('canvas');
+                  canvas.width = size[0];
+                  canvas.height = size[1];
+
+                  var div = document.createElement('div');
+                  div.innerHTML = 'ratio:' + ratio + ',size:' + JSON.stringify(size) + ',realSize:' + JSON.stringify(realSize);
+                  document.body.appendChild(div);
+
+                  var ctx = canvas.getContext("2d");
+                  canvas.style.width = size[0] + 'px';
+                  canvas.style.height = size[1] + 'px';
+                  
+                  //ctx.drawImage(this, 0, 0, size[0], size[1]);
+                  drawImageIOSFix(ctx, image, 0, 0, realSize[0], realSize[1], 0, 0, size[0], size[1]);
+                  //document.body.appendChild(canvas);
+                  // The resized file ready for upload
+                  var finalFile = canvas.toDataURL(fileType);
+                  $.ajax({
+                    type : 'POST',
+                    data : {
+                      blob : finalFile
+                    },
+                    
+                    url : '/upload',
+                    
+                     xhr: function() {
+                        var xhr = new window.XMLHttpRequest();
+                        xhr.upload.addEventListener("progress", function(evt) {
+                            if (evt.lengthComputable) {
+                                var percentComplete = evt.loaded / evt.total;
+                                //Do something with upload progress here
+                            }
+                       }, false);
+
+                       xhr.addEventListener("progress", function(evt) {
+                           if (evt.lengthComputable) {
+                               var percentComplete = evt.loaded / evt.total;
+                               //Do something with download progress
+                           }
+                       }, false);
+
+                       return xhr;
+                    },
+                    
+                    complete : function() {
+                      console.log('done!');
+                    }
+                  })
+                }
+            };
+            if (files && files.length > 0) {
+                file = files[0];
+                try {
+                    // Get window.URL object
+                    var URL = window.URL || window.webkitURL;
+
+                    // Create ObjectURL
+                    var imgURL = URL.createObjectURL(file);
+
+                    // Set img src to ObjectURL
+                    cb(imgURL);
+
+                    // Revoke ObjectURL
+                    URL.revokeObjectURL(imgURL);
+                }
+                catch (e) {
+                    try {
+                        // Fallback if createObjectURL is not supported
+                        var fileReader = new FileReader();
+                        fileReader.onload = function (event) {
+                          alert('onload');
+                            cb(event.target.result);
+                        };
+                        fileReader.readAsDataURL(file);
+                    }
+                    catch (e) {
+                        //
+                        var error = document.querySelector("#error");
+                        if (error) {
+                            error.innerHTML = "Neither createObjectURL or FileReader are supported";
+                        }
+                    }
+                }
+            }
+        return;
+        var file = YOUR_FILE,
+                fileType = file.type,
+                reader = new FileReader();
+
+            reader.onloadend = function() {
+              var image = new Image();
+                  image.src = reader.result;
+
+              image.onload = function() {
+                var maxWidth = 960,
+                    maxHeight = 960,
+                    imageWidth = image.width,
+                    imageHeight = image.height;
+
+                if (imageWidth > imageHeight) {
+                  if (imageWidth > maxWidth) {
+                    imageHeight *= maxWidth / imageWidth;
+                    imageWidth = maxWidth;
+                  }
+                }
+                else {
+                  if (imageHeight > maxHeight) {
+                    imageWidth *= maxHeight / imageHeight;
+                    imageHeight = maxHeight;
+                  }
+                }
+
+                var canvas = document.createElement('canvas');
+                canvas.width = imageWidth;
+                canvas.height = imageHeight;
+
+                var ctx = canvas.getContext("2d");
+                ctx.drawImage(this, 0, 0, imageWidth, imageHeight);
+
+                // The resized file ready for upload
+                var finalFile = canvas.toDataURL(fileType);
+              }
+            }
+
+            reader.readAsDataURL(file);
+        }
+
+        return;
+
+        $('#test').fileupload({
+          pasteZone : null,
+
+          progress : function(e, data) {
+            console.log('progress');
+            //this.progress(data.loaded / data.total);
+          }.bind(this),
+          dataType: 'json',
+          url: '/upload',
+          add: function (e, data) {
+            data.submit()
+              .success(
+                function() {
+                  console.log('done');
+                  next();
+                }.bind(this)
+                )
+                .error(function (jqXHR, textStatus, errorThrown) {
+                  /* ... */})
+                .complete(function (result, textStatus, jqXHR) {
+
+                }.bind(this));
+
+          }.bind(this)
+        });
+      })();
+    </script>
+  </body>
+</html>

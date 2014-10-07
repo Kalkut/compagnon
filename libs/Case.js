@@ -41,6 +41,7 @@ sand.define('Case', [
 			this.staticPoint;
 			this.states = [];
 			this.cancel = 0;
+			this.factor = options.factor || 1;
 			
 			this.debugScope = {}
 			this.debugBox = r.toDOM({
@@ -68,7 +69,7 @@ sand.define('Case', [
 				}
 			})
 
-			this.div.appendChild(this.debugScope)
+			this.div.appendChild(this.debugScope);
 
 			if(this.type === 'txt') {
 				this.txtBloc = r.toDOM({
@@ -120,9 +121,15 @@ sand.define('Case', [
 				this.z = 0;
 
 				//this.div.onmousedown = function (e) {
-					this.start = function (e) {
-					e.preventDefault()
+				this.start = function (e) {
+					e.preventDefault();
+					//e.stopPropagation();
+					console.log("ok")
 					this.clicking = true;
+					this.posClick[0] = e.xy[0]
+					this.posClick[1] = e.xy[1]
+					this.lastFactor = this.lastScale = 1;
+          this.states.push({ type : "caseAction", sState : {rect : jQuery.extend({},this.imgRect), left : this.img.style.left, top : this.img.style.top, width : this.img.style.width, height : this.img.style.height}});
 				}.bind(this)
 				
 				addEventListener("mouseup", function (e) {
@@ -131,17 +138,19 @@ sand.define('Case', [
 
 				this.zoomEvent = function (e) {
 					//if(e.shiftKey || e.scale){
-						e.preventDefault();
+						//e.preventDefault();
 						var delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));// 1 : mousewheelup, 2 : mousewheeldown
 						//var factor = (e.scale > 1 || delta > 0) ? 1.01 : 0.99;
-						var factor = ((this.deltaScale || e.scale) >= e.scale || delta > 0) ? 1.01 : 0.99;
-						this.deltaScale = e.scale || null;
-						this.debugFactor = factor;
+						//this.factor = ((this.deltaScale || e.scale) <= e.scale || delta > 0) ? 1.01 : 0.99;
+						var lf = this.lastFactor;
+						this.factor = e.scale/(this.lastScale || 1) * this.factor;
+						this.factor = this.factor/(this.lastFactor || 1);
+						this.lastFactor = this.factor;
+						//this.debugFactor = this.deltaScale - e.scale;
+						//this.deltaScale = e.scale || null;
+						this.lastScale = e.scale;
+						this.potentialRect = this.imgRect.move({staticPoint : this.staticPoint, scale : this.lastFactor});// Merci Geo
 						
-						this.potentialRect = this.imgRect.move({staticPoint : this.staticPoint, scale : factor});// Merci Geo
-						
-						//console.log(this.potentialRect.segX.length() >= this.divRect.segX.length());
-						//if(e.touches.length > 2) alert(e.touches.length);
 						if(e.touches && e.touches.length > 1) {
 							var tCenter = [0.5*(e.touches[0].clientX + e.touches[1].clientX),0.5*(e.touches[0].clientY+e.touches[1].clientY)]
 						}else {
@@ -159,7 +168,7 @@ sand.define('Case', [
 						
 
 						if( (!this.fit && (( this.potentialRect.segX.length() >= this.divRect.segX.length() ) && ( this.potentialRect.segY.length() >= this.divRect.segY.length() ) ) ) ) {
-							this.zoom(factor);
+							this.zoom(this.factor);
 							
 							this.fire('case:imageMovedPx',this.img.style.left,this.img.style.top,this.img.style.width,this.img.style.height);
 							this.fire('case:imageMovedInt',parseInt(this.img.style.left),parseInt(this.img.style.top),parseInt(this.img.style.width),parseInt(this.img.style.height));
@@ -168,12 +177,12 @@ sand.define('Case', [
 							if(!(Math.ceil(this.potentialRect.segX.c2) >= this.divRect.segX.c2 && Math.floor(this.potentialRect.segX.c1) <= this.divRect.segX.c1 && Math.floor(this.potentialRect.segY.c1) <= this.divRect.segY.c1 && Math.ceil(this.potentialRect.segY.c2) >= this.divRect.segY.c2 ) ) {
 							this.imgRect.setCenter(this.divRect.getCenter())
 							this.staticPoint = this.imgCenter
-							this.zoom(factor,2);
+							this.zoom(this.factor,2);
 							
 							this.fire('case:imageMovedPx',this.img.style.left,this.img.style.top,this.img.style.width,this.img.style.height);
 							this.fire('case:imageMovedInt',parseInt(this.img.style.left),parseInt(this.img.style.top),parseInt(this.img.style.width),parseInt(this.img.style.height));
 							}else {
-								this.zoom(factor);
+								this.zoom(this.factor);
 								
 							}
 
@@ -183,30 +192,41 @@ sand.define('Case', [
 
 				this.div.addEventListener('mousewheel', this.zoomEvent.bind(this))
 
-				//this.div.onmousemove = function (e) {
 					this.drag = function(e) {
 					if(this.clicking && !this.frozen) {
 						this.staticPoint = new r.Geo.Point([e.xy[0] - this.div.offsetLeft, e.xy[1] - this.div.offsetTop].add([document.body.scrollLeft, document.body.scrollTop]));
 						this.staticPoint = this.staticPoint.inRef(this.imgRect.ref);
-						var deltaX = e.xy[0] /*- this.img.width/2*/ - this.posClick[0];
-						var deltaY = e.xy[1] /*- this.img.height/2 */- this.posClick[1];
-						var delta = [deltaX,deltaY];
-						this.debugDelta = delta;
+						//var deltaX = e.xy[0] - this.posClick[0];
+						//var deltaY = e.xy[1] - this.posClick[1];
+						var delta = e.translation || [0,0]//[deltaX,deltaY];
+						//this.debugDelta = delta;
+						this.debugScope.innerHTML = delta;
 						this.potentialRect = this.imgRect.move({vector : delta});
-						
-						if ( (Math.ceil(this.potentialRect.segX.c2) >= this.divRect.segX.c2 && Math.floor(this.potentialRect.segX.c1) <= this.divRect.segX.c1 && Math.floor(this.potentialRect.segY.c1) <= this.divRect.segY.c1 && Math.ceil(this.potentialRect.segY.c2) >= this.divRect.segY.c2 ) ) {
-							this.img.style.left = (parseInt(this.img.style.left) + deltaX) + 'px';
-							this.img.style.top = (parseInt(this.img.style.top) + deltaY) + 'px';
+						var lX = this.potentialRect.segX.length();
+						var lY = this.potentialRect.segY.length();
+
+						this.potentialRect.segX.c1 = Math.min(this.divRect.segX.c1,this.potentialRect.segX.c1);
+						this.potentialRect.segX.c2 = this.potentialRect.segX.c1 + lX;
+						this.potentialRect.segY.c1 = Math.min(this.divRect.segY.c1,this.potentialRect.segY.c1);
+						this.potentialRect.segY.c2 = this.potentialRect.segY.c1 + lY;
+						this.potentialRect.segX.c2 = Math.max(this.divRect.segX.c2,this.potentialRect.segX.c2);
+						this.potentialRect.segX.c1 = this.potentialRect.segX.c2 - lX;
+						this.potentialRect.segY.c2 = Math.max(this.divRect.segY.c2,this.potentialRect.segY.c2);
+						this.potentialRect.segY.c1 = this.potentialRect.segY.c2 - lY;
+
+						//if ( (Math.ceil(this.potentialRect.segX.c2) >= this.divRect.segX.c2 && Math.floor(this.potentialRect.segX.c1) <= this.divRect.segX.c1 && Math.floor(this.potentialRect.segY.c1) <= this.divRect.segY.c1 && Math.ceil(this.potentialRect.segY.c2) >= this.divRect.segY.c2 ) ) {
+							this.img.style.left = this.potentialRect.segX.c1 + 'px';//(parseInt(this.img.style.left) + delta[0]) + 'px';
+							this.img.style.top = this.potentialRect.segY.c1 + 'px';//(parseInt(this.img.style.top) + delta[1]) + 'px';
 							this.imgRect = this.potentialRect;
-						}
+						//}
 						
 						
 
 						this.fire('case:imageMovedPx',this.img.style.left,this.img.style.top,this.img.style.width,this.img.style.height);
 						this.fire('case:imageMovedInt',parseInt(this.img.style.left),parseInt(this.img.style.top),parseInt(this.img.style.width),parseInt(this.img.style.height));
 					}
-					this.posClick[0] = e.xy[0] // - this.img.width/2;
-					this.posClick[1] = e.xy[1] //- this.img.height/2;
+					this.posClick[0] = e.xy[0]
+					this.posClick[1] = e.xy[1]
 
 				}.bind(this)
 
@@ -218,25 +238,25 @@ sand.define('Case', [
 				this.sState;
 				this.eState;
 
-				r.handle(this.div).drag({
-            start : function(e) {
-            	this.start(e);
-            	this.posClick[0] = e.xy[0] // - this.img.width/2;
-							this.posClick[1] = e.xy[1]
-            	this.states.push({ type : "caseAction", sState : {rect : jQuery.extend({},this.imgRect), left : this.img.style.left, top : this.img.style.top, width : this.img.style.width, height : this.img.style.height}});
-            }.bind(this),
+				var handle = r.handle(this.img);
+				handle.device.noRightClick = true;
+
+				handle.drag({
+            start : this.start.bind(this),
             drag : function (e) {
-            	this.debugScope.innerHTML = this.debugDelta;
-            	if(e.touches.length < 2) this.drag(e);
-            	else if(e.shiftKey || e.scale) {
+            	if(e.shiftKey || (e.scale && e.scale != 1)) {
             		this.zoomEvent(e);
-            	}
+            	} 
+            	 this.drag(e);
             	}.bind(this),
-            	end : function() {
+            	end : function(e) {
             		this.states[this.states.length - 1].eState = {rect : jQuery.extend({},this.imgRect), left : this.img.style.left, top : this.img.style.top, width : this.img.style.width, height : this.img.style.height}
             		this.fire('caseAction',this.states.last());
             	}.bind(this)
           });
+
+				if(this.factor && this.factor != 1) this.zoom(this.factor);
+
 			}	
 		},
 
